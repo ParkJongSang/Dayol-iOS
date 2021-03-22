@@ -23,9 +23,7 @@ private enum Design {
     static let dayLeftMargin: CGFloat = 7.0
 }
 
-class DailyPaper: BasePaper {
-    override var identifier: String { DailyPaper.className }
-    
+class DailyPaper: BasePaper {   
     private let disposeBag = DisposeBag()
     
     private let titleArea: UIView = {
@@ -57,8 +55,8 @@ class DailyPaper: BasePaper {
         return view
     }()
     
-    override func configure(viewModel: PaperViewModel, paperStyle: PaperStyle) {
-        super.configure(viewModel: viewModel, paperStyle: paperStyle)
+    override func initView() {
+        super.initView()
         titleArea.addSubview(dateLabel)
         titleArea.addSubview(dayLabel)
         titleArea.addSubview(separatorView)

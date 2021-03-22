@@ -7,40 +7,33 @@
 
 import RxSwift
 
-class BasePaper: UITableViewCell {
-    var identifier: String { BasePaper.className }
+class BasePaper: UIView {  
+    var viewModel: PaperViewModel
+    var paperStyle: PaperStyle
     
-    var viewModel: PaperViewModel?
-    var paperStyle: PaperStyle?
-    
-    let sizeDefinitionView: UIView = {
+    public let sizeDefinitionView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .white
         return view
     }()
     
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        contentView.backgroundColor = UIColor(decimalRed: 246, green: 248, blue: 250)
+    init(viewModel: PaperViewModel, paperStyle: PaperStyle) {
+        self.viewModel = viewModel
+        self.paperStyle = paperStyle
+        super.init(frame: .zero)
+        
+        initView()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(viewModel: PaperViewModel, paperStyle: PaperStyle) {
-        self.viewModel = viewModel
-        self.paperStyle = paperStyle
-        contentView.addSubview(sizeDefinitionView)
-        guard let paperStyle = self.paperStyle else { return }
-        
+    public func initView() {
+        addSubViewPinEdge(sizeDefinitionView)
         NSLayoutConstraint.activate([
-            sizeDefinitionView.widthAnchor.constraint(equalToConstant: paperStyle.size.width),
-            sizeDefinitionView.heightAnchor.constraint(equalToConstant: paperStyle.size.height),
-            sizeDefinitionView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            sizeDefinitionView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            contentView.heightAnchor.constraint(equalTo: sizeDefinitionView.heightAnchor)
+            sizeDefinitionView.heightAnchor.constraint(equalToConstant: paperStyle.size.height)
         ])
     }
 }

@@ -52,8 +52,8 @@ class CornellPaper: BasePaper {
 
     private(set) var isFirstPage: Bool = true
     
-    override func configure(viewModel: PaperViewModel, paperStyle: PaperStyle) {
-        super.configure(viewModel: viewModel, paperStyle: paperStyle)
+    override func initView() {
+        super.initView()
         cornellImageView.image = getCornellImage(isFirstPage: isFirstPage)
         cornellImageView.contentMode = .topLeft
         sizeDefinitionView.addSubViewPinEdge(cornellImageView)
@@ -62,7 +62,6 @@ class CornellPaper: BasePaper {
 
 private extension CornellPaper {
     func getCornellImage(isFirstPage: Bool) -> UIImage? {
-        guard let paperStyle = self.paperStyle else { return nil }
         let paperSize = CGSize(width: paperStyle.size.width, height: paperStyle.size.height)
         UIGraphicsBeginImageContextWithOptions(paperSize, false, 0.0)
 

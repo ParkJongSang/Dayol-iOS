@@ -104,6 +104,7 @@
 		DACE3B232587BD1A0067467B /* DXRMbxStd-B.otf in Resources */ = {isa = PBXBuildFile; fileRef = DACE3B222587BD1A0067467B /* DXRMbxStd-B.otf */; };
 		DAD489EF26026A33008B542E /* DrawingContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD489EE26026A33008B542E /* DrawingContentView.swift */; };
 		DAD489F326026A41008B542E /* StickerContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD489F226026A41008B542E /* StickerContentView.swift */; };
+		DAD48A112608ECC6008B542E /* PaperProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD48A102608ECC6008B542E /* PaperProvider.swift */; };
 		DAD66734259B551600E8F59A /* DiaryEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD66733259B551600E8F59A /* DiaryEditViewController.swift */; };
 		DAD66738259B570800E8F59A /* DYNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD66737259B570800E8F59A /* DYNavigationController.swift */; };
 		DAD66746259C691300E8F59A /* DYNavigationItemCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD66745259C691300E8F59A /* DYNavigationItemCreator.swift */; };
@@ -233,6 +234,7 @@
 		DACE3B222587BD1A0067467B /* DXRMbxStd-B.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DXRMbxStd-B.otf"; sourceTree = "<group>"; };
 		DAD489EE26026A33008B542E /* DrawingContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingContentView.swift; sourceTree = "<group>"; };
 		DAD489F226026A41008B542E /* StickerContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickerContentView.swift; sourceTree = "<group>"; };
+		DAD48A102608ECC6008B542E /* PaperProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperProvider.swift; sourceTree = "<group>"; };
 		DAD66733259B551600E8F59A /* DiaryEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryEditViewController.swift; sourceTree = "<group>"; };
 		DAD66737259B570800E8F59A /* DYNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DYNavigationController.swift; sourceTree = "<group>"; };
 		DAD66745259C691300E8F59A /* DYNavigationItemCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DYNavigationItemCreator.swift; sourceTree = "<group>"; };
@@ -437,6 +439,7 @@
 				3416448825DC05A900A81FD2 /* FourPaper.swift */,
 				DA27AC5725C6D68600C71CDE /* WeeklyCalendarView */,
 				DAF18EA025B70FAB007ACFAC /* MonthlyCalendarView */,
+				DAD48A102608ECC6008B542E /* PaperProvider.swift */,
 			);
 			path = Papers;
 			sourceTree = "<group>";
@@ -1090,6 +1093,7 @@
 				DAD66751259F44D300E8F59A /* DYNavigationDrawingToolbar.swift in Sources */,
 				DAEF76B225F90D6E007CAA93 /* DiaryPaperViewerViewController+UIPageViewController.swift in Sources */,
 				DADD0AD425AF24FC004D6CF0 /* DYStickerView.swift in Sources */,
+				DAD48A112608ECC6008B542E /* PaperProvider.swift in Sources */,
 				DAD6674E259C8C5B00E8F59A /* DYNavigationEditableTitle.swift in Sources */,
 				34CA254C25A619B20057404D /* SettingsModel.swift in Sources */,
 				34A2EDCC25B86210008DB98D /* PaperViewModel.swift in Sources */,

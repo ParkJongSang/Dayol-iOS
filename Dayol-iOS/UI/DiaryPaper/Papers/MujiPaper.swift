@@ -8,6 +8,5 @@
 import RxSwift
 
 class MujiPaper: BasePaper {
-    override var identifier: String { MujiPaper.className }
-}
 
+}

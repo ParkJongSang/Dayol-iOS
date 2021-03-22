@@ -20,8 +20,8 @@ class FourPaper: BasePaper {
         return imageView
     }()
     
-    override func configure(viewModel: PaperViewModel, paperStyle: PaperStyle) {
-        super.configure(viewModel: viewModel, paperStyle: paperStyle)
+    override func initView() {
+        super.initView()
         fourImageView.image = getGridImage()
         sizeDefinitionView.addSubViewPinEdge(fourImageView)
     }
@@ -29,7 +29,6 @@ class FourPaper: BasePaper {
 
 private extension FourPaper {
     func getGridImage() -> UIImage? {
-        guard let paperStyle = self.paperStyle else { return nil }
         let paperSize = CGSize(width: paperStyle.size.width, height: paperStyle.size.height)
         UIGraphicsBeginImageContextWithOptions(paperSize, false, 0.0)
 

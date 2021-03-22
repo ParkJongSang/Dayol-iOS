@@ -6,32 +6,46 @@
 //
 
 import UIKit
-import RxSwift
-import RxCocoa
+import Combine
 
 class DiaryPaperViewController: UIViewController {
     let index: Int
     let paper: PaperPresentView
+    let scaleSubject = PassthroughSubject<CGFloat, Error>()
     
-    private var scaleForFit: CGFloat {
-        switch Orientation.currentState {
-        case .portrait:
-            switch paper.paperStyle {
-            case .vertical:
-                return view.frame.height / paper.paperStyle.size.height
-            case .horizontal:
-                return view.frame.width / paper.paperStyle.size.width
+    private var cancellable = [AnyCancellable]()
+    private var paperHeight = NSLayoutConstraint()
+    
+    private var scaleVariable: CGFloat {
+        if isPadDevice {
+            switch Orientation.currentState {
+            case .portrait:
+                switch paper.style {
+                case .vertical:
+                    return view.frame.height / paper.style.size.height
+                case .horizontal:
+                    return view.frame.width / paper.style.size.width
+                }
+            case .landscape:
+                switch paper.style {
+                case .vertical:
+                    return view.frame.height / paper.style.size.height
+                case .horizontal:
+                    return view.frame.width / paper.style.size.width
+                }
+            default: return 0.0
             }
-        case .landscape:
-            switch paper.paperStyle {
-            case .vertical:
-                return view.frame.height / paper.paperStyle.size.height
-            case .horizontal:
-                return view.frame.width / paper.paperStyle.size.width
-            }
-        default: return 0.0
+        } else {
+            return view.frame.width / paper.style.size.width
         }
     }
+    
+    private let scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        
+        return scrollView
+    }()
     
     init(index: Int, paper: PaperPresentView) {
         self.index = index
@@ -48,13 +62,52 @@ class DiaryPaperViewController: UIViewController {
         super.viewDidLoad()
         initView()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+  
 
+        scaleSubject.send(scaleVariable)
+    }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        scaleSubject.send(scaleVariable)
     }
     
     private func initView() {
-        view.addSubViewPinEdge(paper)
+        scrollView.delegate = self
+        scrollView.minimumZoomScale = 1.0
+        scrollView.maximumZoomScale = 3.0
+        view.addSubViewPinEdge(scrollView)
+        scrollView.addSubViewPinEdge(paper)
         view.backgroundColor = UIColor(decimalRed: 246, green: 248, blue: 250)
+        setupConstraint()
+        
+        combine()
     }
+    
+    private func setupConstraint() {
+        NSLayoutConstraint.activate([
+            paper.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
+        ])
+    }
+    
+    private func combine() {
+        let scaleCombine = scaleSubject.sink { error in
+            // do Something
+        } receiveValue: { [weak self] value in
+            guard let self = self else { return }
+            self.paper.scaleForFit = value
+        }
+
+        cancellable.append(scaleCombine)
+    }
+}
+
+extension DiaryPaperViewController: UIScrollViewDelegate {
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return paper
+    }
+
 }

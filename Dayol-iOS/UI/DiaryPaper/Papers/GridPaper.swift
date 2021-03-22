@@ -31,16 +31,14 @@ private extension PaperStyle {
 }
 
 class GridPaper: BasePaper {
-    override var identifier: String { GridPaper.className }
-    
     private let gridImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
-
-    override func configure(viewModel: PaperViewModel, paperStyle: PaperStyle) {
-        super.configure(viewModel: viewModel, paperStyle: paperStyle)
+    
+    override func initView() {
+        super.initView()
         gridImageView.image = getGridImage()
         gridImageView.contentMode = .topLeft
 
@@ -51,8 +49,6 @@ class GridPaper: BasePaper {
 private extension GridPaper {
 
     func getGridImage() -> UIImage? {
-        guard let paperStyle = self.paperStyle else { return nil }
-        
         UIGraphicsBeginImageContextWithOptions(paperStyle.gridSize, false, 0.0)
 
         guard let context = UIGraphicsGetCurrentContext() else {
