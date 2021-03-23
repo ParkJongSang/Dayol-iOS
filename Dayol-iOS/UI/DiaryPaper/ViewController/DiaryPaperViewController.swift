@@ -22,21 +22,21 @@ class DiaryPaperViewController: UIViewController {
             case .portrait:
                 switch paper.style {
                 case .vertical:
-                    return view.frame.height / paper.style.size.height
+                    return scrollView.frame.height / paper.style.size.height
                 case .horizontal:
-                    return view.frame.width / paper.style.size.width
+                    return scrollView.frame.width / paper.style.size.width
                 }
             case .landscape:
                 switch paper.style {
                 case .vertical:
-                    return view.frame.height / paper.style.size.height
+                    return scrollView.frame.height / paper.style.size.height
                 case .horizontal:
-                    return view.frame.width / paper.style.size.width
+                    return scrollView.frame.width / paper.style.size.width
                 }
             default: return 0.0
             }
         } else {
-            return view.frame.width / paper.style.size.width
+            return scrollView.frame.width / paper.style.size.width
         }
     }
     
@@ -59,20 +59,13 @@ class DiaryPaperViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        super.viewDidLoad()
         initView()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-  
-
-        scaleSubject.send(scaleVariable)
+        super.viewDidLoad()
     }
     
     override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
         scaleSubject.send(scaleVariable)
+        super.viewDidLayoutSubviews()
     }
     
     private func initView() {
@@ -109,5 +102,4 @@ extension DiaryPaperViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return paper
     }
-
 }

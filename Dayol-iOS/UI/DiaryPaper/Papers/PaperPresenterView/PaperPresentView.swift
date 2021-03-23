@@ -15,16 +15,24 @@ class PaperPresentView: UIView {
     typealias PaperModel = DiaryInnerModel.PaperModel
     private let paper: PaperModel
     private let numberOfPapers: Int
-   
+    private var contentTop = NSLayoutConstraint()
+    private var contentBottom = NSLayoutConstraint()
+
     var scaleForFit: CGFloat = 0.0 {
         didSet {
-            transform = CGAffineTransform(scaleX: scaleForFit, y: scaleForFit)
+            DispatchQueue.main.async {
+                let scale = CGAffineTransform(scaleX: self.scaleForFit, y: self.scaleForFit)
+                self.paperContentView.transform = scale
+                let constarintConstant: CGFloat = (self.height - self.paperContentView.frame.height) / 2
+                self.contentTop.constant = -constarintConstant
+                self.contentBottom.constant = constarintConstant
+            }
         }
     }
     
     // MARK: - UI
     
-     let paperContentView: UIStackView = {
+    private let paperContentView: UIStackView = {
         let stackView = UIStackView(frame: .zero)
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
@@ -74,12 +82,11 @@ class PaperPresentView: UIView {
     }
     
     private func setupConstraint(){
+        contentTop = paperContentView.topAnchor.constraint(equalTo: topAnchor)
+        contentBottom = paperContentView.bottomAnchor.constraint(equalTo: bottomAnchor)
         NSLayoutConstraint.activate([
-            paperContentView.topAnchor.constraint(equalTo: topAnchor),
-            paperContentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            contentTop, contentBottom,
             paperContentView.widthAnchor.constraint(equalToConstant: style.size.width),
-            paperContentView.heightAnchor.constraint(equalTo: heightAnchor),
-            
             paperContentView.centerYAnchor.constraint(equalTo: centerYAnchor),
             paperContentView.centerXAnchor.constraint(equalTo: centerXAnchor)
         ])
