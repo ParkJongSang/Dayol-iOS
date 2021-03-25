@@ -14,6 +14,6 @@ class DiaryEditViewModel {
     let diaryInitalTitle: String = "새 다이어리"
     
     func createDiaryInfo(model: DiaryCoverModel) {
-        DiaryListTestData.shared.create(diary: model)
+        DYTestData.shared.create(diary: model)
     }
 }

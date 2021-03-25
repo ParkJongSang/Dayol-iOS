@@ -27,7 +27,7 @@ class DeletedPageViewModel {
     }
 
     func deleteAll() {
-        DeletedPageListTestData.shared.deleteAll()
+        DYTestData.shared.deleteAllDeletedPage()
         deletedPageEvent.onNext(.deleteAll)
     }
 
@@ -42,7 +42,7 @@ class DeletedPageViewModel {
 private extension DeletedPageViewModel {
 
     func bindData() {
-        DeletedPageListTestData.shared.pageListSubject
+        DYTestData.shared.deletedPageListSubject
             .subscribe(onNext: { [weak self] model in
                 guard let self = self else { return }
                 self.pageList = model

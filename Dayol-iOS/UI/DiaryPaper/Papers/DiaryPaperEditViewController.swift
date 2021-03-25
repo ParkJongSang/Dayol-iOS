@@ -48,10 +48,17 @@ class DiaryPaperEditViewController: DiaryPaperViewController {
         setToolbarItems([leftFlexibleSpace, UIBarButtonItem(customView: toolBar), rightFlexibleSpace], animated: false)
         
         leftButton.addTarget(self, action: #selector(popWithAnimation), for: .touchUpInside)
+        toolBar.stickerButton.addTarget(self, action: #selector(presentStickerModal), for: .touchUpInside)
     }
     
     @objc
     private func popWithAnimation() {
         self.navigationController?.popViewController(animated: true)
+    }
+    
+    @objc
+    private func presentStickerModal() {
+        let stickerModal = StickerModalViewContoller()
+        self.presentCustomModal(stickerModal)
     }
 }

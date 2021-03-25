@@ -25,7 +25,7 @@ class DiaryListViewModel {
     
     private func bind() {
         // TODO: Login For Test. Please, remove this code after DB determined
-        DiaryListTestData.shared.diaryListSubject
+        DYTestData.shared.diaryListSubject
             .subscribe(onNext: { [weak self] model in
                 guard let self = self else { return }
                 self.diaryList = model
