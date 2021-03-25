@@ -93,7 +93,6 @@ extension DiaryListViewController {
         let diaryPaperViewModel = DiaryPaperViewerViewModel(coverModel: diaryCover)
         let diaryPaperViewController = DiaryPaperViewerViewController(viewModel: diaryPaperViewModel)
         let nav = DYNavigationController(rootViewController: diaryPaperViewController)
-        nav.navigationBar.barTintColor = diaryCover.color.coverColor
         nav.modalPresentationStyle = .fullScreen
         self.present(nav, animated: true, completion: nil)
     }

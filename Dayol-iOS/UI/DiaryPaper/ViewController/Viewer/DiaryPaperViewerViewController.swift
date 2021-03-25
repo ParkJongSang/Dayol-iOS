@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import Combine
 
 private enum Design {
     static let addPageModalTopMargin: CGFloat = 57.0
@@ -19,8 +20,11 @@ class DiaryPaperViewerViewController: UIViewController {
     typealias PaperModel = DiaryInnerModel.PaperModel
     
     private let disposeBag = DisposeBag()
+    private var cancellable = [Cancellable]()
     private let viewModel: DiaryPaperViewerViewModel
     private var innerModels: [DiaryInnerModel]?
+    
+    var currentIndex: Int = 0
     
     // MARK: - UI Component
     
@@ -56,6 +60,16 @@ class DiaryPaperViewerViewController: UIViewController {
         super.viewDidLoad()
         initView()
         bind()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        navigationController?.navigationBar.barTintColor = viewModel.coverColor
+        super.viewWillAppear(animated)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        navigationController?.navigationBar.barTintColor = .white
+        super.viewWillDisappear(animated)
     }
     
     private func initView() {
@@ -125,18 +139,19 @@ class DiaryPaperViewerViewController: UIViewController {
                 return shouldShowDiaryPeper
             })
             .subscribe(onNext: { [weak self] inners in
+                guard let self = self else { return }
+                
                 let paperList = inners[0].paperList
-                //let papers = paperList.map { PaperProvider.createPaper(paperType: $0.paperType, paperStyle: $0.paperStyle, drawModel: $0.drawModelList) }
                 var diaryPaperViewControllers = [DiaryPaperViewController]()
-                self?.innerModels = inners
+                self.innerModels = inners
                 
                 for (index, paper) in paperList.enumerated() {
-                    let paperPresentView = PaperPresentView(paper: paper, count: 3)
-                    //paperPresentView.addPage(paper)
-                    diaryPaperViewControllers.append(DiaryPaperViewController(index: index, paper: paperPresentView))
+                    let paperViewModel = DiaryPaperViewModel(paper: paper, numberOfPapers: 1)
+                    let paperViewController = DiaryPaperViewController(index: index, viewModel: paperViewModel)
+                    diaryPaperViewControllers.append(paperViewController)
                 }
-                self?.paperViewControllers = diaryPaperViewControllers
-                self?.pageViewController.setViewControllers([diaryPaperViewControllers[0]], direction: .forward, animated: true, completion: nil)
+                self.paperViewControllers = diaryPaperViewControllers
+                self.pageViewController.setViewControllers([diaryPaperViewControllers[0]], direction: .forward, animated: true, completion: nil)
             })
             .disposed(by: disposeBag)
     }
@@ -154,6 +169,15 @@ class DiaryPaperViewerViewController: UIViewController {
             }
             .disposed(by: disposeBag)
 
+        toolBar.editButton.rx.tap
+            .bind { [weak self] in
+                guard let currentVC = self?.currentViewController else { return }
+                let viewModel = currentVC.viewModel
+                let paperEditViewController = DiaryPaperEditViewController(viewModel: viewModel)
+                self?.navigationController?.pushViewController(paperEditViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
         let tapGesture = UITapGestureRecognizer()
         tapGesture.addTarget(self, action: #selector(didTapEmptyView))
         emptyView.addGestureRecognizer(tapGesture)
@@ -182,5 +206,13 @@ class DiaryPaperViewerViewController: UIViewController {
         }
         let addPageVC = PaperModalViewController(toolType: toolType, configure: configuration, papers: papers)
         presentCustomModal(addPageVC)
+    }
+}
+
+extension DiaryPaperViewerViewController {
+    var currentViewController: DiaryPaperViewController? {
+        guard let viewControllers = pageViewController.viewControllers as? [DiaryPaperViewController] else { return nil }
+        
+        return viewControllers[safe: currentIndex]
     }
 }

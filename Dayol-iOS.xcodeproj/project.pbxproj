@@ -105,6 +105,9 @@
 		DAD489EF26026A33008B542E /* DrawingContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD489EE26026A33008B542E /* DrawingContentView.swift */; };
 		DAD489F326026A41008B542E /* StickerContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD489F226026A41008B542E /* StickerContentView.swift */; };
 		DAD48A112608ECC6008B542E /* PaperProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD48A102608ECC6008B542E /* PaperProvider.swift */; };
+		DAD48A23260C9DF8008B542E /* DiaryPaperEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD48A22260C9DF8008B542E /* DiaryPaperEditViewController.swift */; };
+		DAD48A26260CC943008B542E /* DiaryPaperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD48A25260CC943008B542E /* DiaryPaperViewModel.swift */; };
+		DAD48A29260CCAEC008B542E /* DiaryPaperEditViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD48A28260CCAEC008B542E /* DiaryPaperEditViewModel.swift */; };
 		DAD66734259B551600E8F59A /* DiaryEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD66733259B551600E8F59A /* DiaryEditViewController.swift */; };
 		DAD66738259B570800E8F59A /* DYNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD66737259B570800E8F59A /* DYNavigationController.swift */; };
 		DAD66746259C691300E8F59A /* DYNavigationItemCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD66745259C691300E8F59A /* DYNavigationItemCreator.swift */; };
@@ -235,6 +238,9 @@
 		DAD489EE26026A33008B542E /* DrawingContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingContentView.swift; sourceTree = "<group>"; };
 		DAD489F226026A41008B542E /* StickerContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickerContentView.swift; sourceTree = "<group>"; };
 		DAD48A102608ECC6008B542E /* PaperProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperProvider.swift; sourceTree = "<group>"; };
+		DAD48A22260C9DF8008B542E /* DiaryPaperEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DiaryPaperEditViewController.swift; path = "Dayol-iOS/UI/DiaryPaper/Papers/DiaryPaperEditViewController.swift"; sourceTree = SOURCE_ROOT; };
+		DAD48A25260CC943008B542E /* DiaryPaperViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryPaperViewModel.swift; sourceTree = "<group>"; };
+		DAD48A28260CCAEC008B542E /* DiaryPaperEditViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryPaperEditViewModel.swift; sourceTree = "<group>"; };
 		DAD66733259B551600E8F59A /* DiaryEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryEditViewController.swift; sourceTree = "<group>"; };
 		DAD66737259B570800E8F59A /* DYNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DYNavigationController.swift; sourceTree = "<group>"; };
 		DAD66745259C691300E8F59A /* DYNavigationItemCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DYNavigationItemCreator.swift; sourceTree = "<group>"; };
@@ -856,6 +862,24 @@
 			path = PaperPresenterView;
 			sourceTree = "<group>";
 		};
+		DAD48A20260C9DC1008B542E /* Edit */ = {
+			isa = PBXGroup;
+			children = (
+				DAD48A22260C9DF8008B542E /* DiaryPaperEditViewController.swift */,
+				DAD48A28260CCAEC008B542E /* DiaryPaperEditViewModel.swift */,
+			);
+			path = Edit;
+			sourceTree = "<group>";
+		};
+		DAD48A21260C9DD1008B542E /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				DADD0A1725A728F2004D6CF0 /* Viewer */,
+				DAD48A20260C9DC1008B542E /* Edit */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
 		DAD66732259B54FD00E8F59A /* DiaryEdit */ = {
 			isa = PBXGroup;
 			children = (
@@ -902,9 +926,9 @@
 		DADD0A1625A728C9004D6CF0 /* DiaryPaper */ = {
 			isa = PBXGroup;
 			children = (
+				DAD48A21260C9DD1008B542E /* ViewController */,
 				34B6C13C25BDB24F00C2596F /* InputAccessaryView */,
 				34A2EDC025B85647008DB98D /* Model */,
-				DADD0A1725A728F2004D6CF0 /* ViewController */,
 				DADD0A1E25A72A59004D6CF0 /* View */,
 				34B6C13325BB4F7A00C2596F /* Papers */,
 				34A2EDCA25B861DC008DB98D /* ViewModel */,
@@ -912,7 +936,7 @@
 			path = DiaryPaper;
 			sourceTree = "<group>";
 		};
-		DADD0A1725A728F2004D6CF0 /* ViewController */ = {
+		DADD0A1725A728F2004D6CF0 /* Viewer */ = {
 			isa = PBXGroup;
 			children = (
 				DADD0A1825A72907004D6CF0 /* DiaryPaperViewerViewController.swift */,
@@ -920,8 +944,9 @@
 				DAEF76A625F66F15007CAA93 /* DiaryPaperViewerModel.swift */,
 				DAEF76A325F66EE7007CAA93 /* DiaryPaperViewerViewModel.swift */,
 				DAEF76BB25F90ED6007CAA93 /* DiaryPaperViewController.swift */,
+				DAD48A25260CC943008B542E /* DiaryPaperViewModel.swift */,
 			);
-			path = ViewController;
+			path = Viewer;
 			sourceTree = "<group>";
 		};
 		DADD0A1E25A72A59004D6CF0 /* View */ = {
@@ -1127,6 +1152,7 @@
 				34CA254225A613CE0057404D /* String+Extension.swift in Sources */,
 				DA81DF4625BEE5A400A4B2CE /* MonthlyCalendarHeaderView.swift in Sources */,
 				CE8DCAE4258D28F4007738EA /* HomeTabBarButton.swift in Sources */,
+				DAD48A29260CCAEC008B542E /* DiaryPaperEditViewModel.swift in Sources */,
 				34A2EDC225B856D1008DB98D /* PaperModel.swift in Sources */,
 				34AD5A8425C9A87600D9E29C /* PaperListAddCell.swift in Sources */,
 				CEB9EE422583C94E005B66C9 /* DayolAlertViewController.swift in Sources */,
@@ -1135,6 +1161,7 @@
 				34CA255E25A761060057404D /* OutAppSettingCell.swift in Sources */,
 				CE8DCAE3258D28F4007738EA /* HomeEmptyView.swift in Sources */,
 				CE8DCAEB258D292A007738EA /* UIFont+Extension.swift in Sources */,
+				DAD48A26260CC943008B542E /* DiaryPaperViewModel.swift in Sources */,
 				DAC04CC62592036F003A7BC8 /* DairyView.swift in Sources */,
 				DA81DF4B25BEE5B600A4B2CE /* MonthlyCalendarCollectionView.swift in Sources */,
 				CE8DCC912590E890007738EA /* DiaryListViewController+CollectionView.swift in Sources */,
@@ -1146,6 +1173,7 @@
 				CE8DCB16258FA5FD007738EA /* DiaryCoverModel.swift in Sources */,
 				340E56A125C2DC73007F2EF7 /* DYToastView.swift in Sources */,
 				3449D2CA25ADF6520050C02A /* AddPaperModel.swift in Sources */,
+				DAD48A23260C9DF8008B542E /* DiaryPaperEditViewController.swift in Sources */,
 				DA81DF3B25BEE49A00A4B2CE /* MonthlyCalendarView.swift in Sources */,
 				3416446225D96C3100A81FD2 /* DeletedPageCell.swift in Sources */,
 				CE06035B25890B1700FBBEF0 /* DayolAlertAction.swift in Sources */,

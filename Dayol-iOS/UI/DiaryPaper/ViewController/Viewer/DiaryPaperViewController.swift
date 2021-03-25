@@ -10,35 +10,38 @@ import Combine
 
 class DiaryPaperViewController: UIViewController {
     let index: Int
-    let paper: PaperPresentView
     let scaleSubject = PassthroughSubject<CGFloat, Error>()
+    let viewModel: DiaryPaperViewModel
     
     private var cancellable = [AnyCancellable]()
     private var paperHeight = NSLayoutConstraint()
-    
+
     private var scaleVariable: CGFloat {
+        let paperStyle = viewModel.paper.paperStyle
         if isPadDevice {
             switch Orientation.currentState {
             case .portrait:
-                switch paper.style {
+                switch paperStyle {
                 case .vertical:
-                    return scrollView.frame.height / paper.style.size.height
+                    return scrollView.frame.height / paperStyle.size.height
                 case .horizontal:
-                    return scrollView.frame.width / paper.style.size.width
+                    return scrollView.frame.width / paperStyle.size.width
                 }
             case .landscape:
-                switch paper.style {
+                switch paperStyle {
                 case .vertical:
-                    return scrollView.frame.height / paper.style.size.height
+                    return scrollView.frame.height / paperStyle.size.height
                 case .horizontal:
-                    return scrollView.frame.width / paper.style.size.width
+                    return scrollView.frame.width / paperStyle.size.width
                 }
             default: return 0.0
             }
         } else {
-            return scrollView.frame.width / paper.style.size.width
+            return scrollView.frame.width / paperStyle.size.width
         }
     }
+    
+    private lazy var paper = PaperPresentView(paper: viewModel.paper, count: viewModel.numberOfPapers)
     
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -47,10 +50,10 @@ class DiaryPaperViewController: UIViewController {
         return scrollView
     }()
     
-    init(index: Int, paper: PaperPresentView) {
+    init(index: Int, viewModel: DiaryPaperViewModel) {
         self.index = index
-        self.paper = paper
-        self.paper.translatesAutoresizingMaskIntoConstraints = false
+        self.viewModel = viewModel
+        
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -59,16 +62,18 @@ class DiaryPaperViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        initView()
         super.viewDidLoad()
+        initView()
     }
     
     override func viewDidLayoutSubviews() {
-        scaleSubject.send(scaleVariable)
         super.viewDidLayoutSubviews()
+        scaleSubject.send(scaleVariable)
     }
     
     private func initView() {
+        paper.translatesAutoresizingMaskIntoConstraints = false
+        
         scrollView.delegate = self
         scrollView.minimumZoomScale = 1.0
         scrollView.maximumZoomScale = 3.0

@@ -39,7 +39,7 @@ class DiaryPageTestData {
                                                        paperType: .daily(date: Date()),
                                                        drawModelList: testDrawModel),
                             DiaryInnerModel.PaperModel(id: 1,
-                                                       paperStyle: .horizontal,
+                                                       paperStyle: .vertical,
                                                        paperType: .cornell,
                                                        drawModelList: testDrawModel),
                             DiaryInnerModel.PaperModel(id: 2,

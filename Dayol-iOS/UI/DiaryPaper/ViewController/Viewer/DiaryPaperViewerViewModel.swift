@@ -20,6 +20,10 @@ class DiaryPaperViewerViewModel {
         return model.innerModelsSubject.asObservable()
     }
     
+    var coverColor: UIColor {
+        return coverModel.color.coverColor
+    }
+    
     init(coverModel: DiaryCoverModel) {
         self.coverModel = coverModel
         self.model = DiaryPaperViewerModel(coverModel: coverModel)

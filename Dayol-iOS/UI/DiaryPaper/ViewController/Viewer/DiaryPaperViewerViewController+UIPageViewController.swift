@@ -28,4 +28,10 @@ extension DiaryPaperViewerViewController: UIPageViewControllerDataSource {
         let nextIndex = paperViewController.index + 1
         return paperViewControllers[safe: nextIndex]
     }
+    
+    func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+        guard let currentViewContoller = pageViewController.presentingViewController as? DiaryPaperViewController else { return }
+        
+        currentIndex = currentViewContoller.index
+    }
 }
