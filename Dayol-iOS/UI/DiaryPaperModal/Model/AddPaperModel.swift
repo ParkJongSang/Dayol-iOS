@@ -8,7 +8,6 @@
 import Foundation
 
 enum PaperModalModel {
-
     struct AddPaperCellModel {
         let paperStyle: PaperStyle
         let paperType: PaperType
@@ -35,7 +34,6 @@ enum PaperModalModel {
             return paperType.tumbNailImageName + "_\(paperStyle.rawValue)"
         }
     }
-    
 }
 
 private extension PaperType {

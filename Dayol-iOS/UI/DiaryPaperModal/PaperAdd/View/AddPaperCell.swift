@@ -58,7 +58,6 @@ class AddPaperCell: UICollectionViewCell {
         return stackView
     }()
 
-
     // MARK: - Init
 
     override init(frame: CGRect) {

@@ -41,7 +41,6 @@ class AddPaperContentViewModel {
 }
 
 extension AddPaperContentViewModel {
-
     func cellModel(_ indexPath: IndexPath, paperStyle: PaperStyle) -> PaperModalModel.AddPaperCellModel? {
 
         guard let cellModel = papers[paperStyle]?[safe: indexPath.row] else {

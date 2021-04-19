@@ -242,9 +242,9 @@ extension DYModalViewController {
             withDuration: 0.25,
             delay: 0,
             options: [.curveEaseOut, .preferredFramesPerSecond60]
-        ) {
-            self.updateContentViewBottomMargin(0)
-            self.view.layoutIfNeeded()
+        ) { [weak self] in
+            self?.updateContentViewBottomMargin(0)
+            self?.view.layoutIfNeeded()
         }
     }
 

@@ -17,6 +17,11 @@ private enum Text {
 
 }
 
+public protocol PaperModalViewDelegate: NSObject {
+    func didTappedItem(_ index: Int)
+    func didTappedAdd()
+}
+
 class PaperModalViewController: DYModalViewController {
 
     enum PaperToolType {
@@ -32,6 +37,8 @@ class PaperModalViewController: DYModalViewController {
     private lazy var addPaperContentView = AddPaperContentView()
     private lazy var paperListHeaderView = PaperListHeaderView()
     private lazy var paperListContentView = PaperListContentView(papers: papers)
+    
+    public weak var delegate: PaperModalViewDelegate?
 
     var toolType: PaperToolType
     var didSelectContentItem: Observable<Int> {
@@ -49,6 +56,10 @@ class PaperModalViewController: DYModalViewController {
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
+    deinit {
+        print("aaaa")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTitleArea()
@@ -119,6 +130,22 @@ private extension PaperModalViewController {
             .bind { [weak self] in
                 self?.dismiss(animated: true)
             }
+            .disposed(by: disposeBag)
+        
+        didSelectAddItem
+            .subscribe(onNext: { [weak self] in
+                self?.dismiss(animated: true) {
+                    self?.delegate?.didTappedAdd()
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        didSelectContentItem
+            .subscribe(onNext: { [weak self] index in
+                self?.dismiss(animated: true) {
+                    self?.delegate?.didTappedItem(index)
+                }
+            })
             .disposed(by: disposeBag)
     }
 }
