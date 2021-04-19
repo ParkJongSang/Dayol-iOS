@@ -37,6 +37,9 @@ class PaperModalViewController: DYModalViewController {
     var didSelectContentItem: Observable<Int> {
         return paperListContentView.didSelectItem.asObservable()
     }
+    var didSelectAddItem: Observable<Void> {
+        return paperListContentView.didSelectAddCell.asObservable()
+    }
 
     init(toolType: PaperToolType, configure: DYModalConfiguration, papers: [PaperModalModel.PaperListCellModel] = [PaperModalModel.PaperListCellModel]()) {
         self.papers = papers
@@ -104,8 +107,9 @@ private extension PaperModalViewController {
 
         addPaperHeaderView.barRightButton.rx.tap
             .bind { [weak self] in
-                // rx create event
-                self?.dismiss(animated: true)
+                self?.dismiss(animated: true, completion: {
+                    self?.addPaperContentView.viewModel.addPaper()
+                })
             }
             .disposed(by: disposeBag)
     }

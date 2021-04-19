@@ -151,7 +151,7 @@ class DiaryPaperViewerViewController: UIViewController {
                     diaryPaperViewControllers.append(paperViewController)
                 }
                 self.paperViewControllers = diaryPaperViewControllers
-                self.pageViewController.setViewControllers([diaryPaperViewControllers[0]], direction: .forward, animated: true, completion: nil)
+                self.pageViewController.setViewControllers([diaryPaperViewControllers[self.currentIndex]], direction: .forward, animated: false, completion: nil)
             })
             .disposed(by: disposeBag)
     }
@@ -204,25 +204,39 @@ class DiaryPaperViewerViewController: UIViewController {
                                                paperStyle: $0.paperStyle,
                                                paperType: $0.paperType)
         }
-        let addPageVC = PaperModalViewController(toolType: toolType, configure: configuration, papers: papers)
-        
-        addPageVC.didSelectContentItem
+        let modalVC = PaperModalViewController(toolType: toolType, configure: configuration, papers: papers)
+
+        modalVC.didSelectContentItem
             .subscribe(onNext: { [weak self] index in
                 guard let self = self else { return }
                 
                 let dismissCompletionHandler: () -> Void = {
                     guard let selectedViewController = self.paperViewControllers?[safe: index] else { return }
                     
-                    self.pageViewController.setViewControllers([selectedViewController], direction: .forward, animated: true, completion: nil)
+                    self.pageViewController.setViewControllers([selectedViewController], direction: .forward, animated: false, completion: nil)
                 }
                 
-                addPageVC.dismiss(animated: true) {
+                modalVC.dismiss(animated: true) {
                     dismissCompletionHandler()
                 }
             })
             .disposed(by: disposeBag)
         
-        presentCustomModal(addPageVC)
+        modalVC.didSelectAddItem
+            .subscribe(onNext: { [weak self] in
+                guard let self = self else { return }
+                
+                let dismissCompletionHandler: () -> Void = {
+                    self.presentPaperModal(toolType: .add)
+                }
+                
+                modalVC.dismiss(animated: true) {
+                    dismissCompletionHandler()
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        presentCustomModal(modalVC)
     }
 }
 

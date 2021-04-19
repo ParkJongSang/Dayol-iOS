@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 private enum Design {
     static let titleFont = UIFont.appleBold(size: 18.0)
@@ -23,9 +25,12 @@ private enum Text: String {
 }
 
 class AddPaperHeaderView: UIView {
-
+    private(set) var disposeBag = DisposeBag()
     private(set) var barLeftButton = DYNavigationItemCreator.barButton(type: .cancel)
     private(set) var barRightButton = DYNavigationItemCreator.barButton(type: .done)
+    
+    let didTappedDone = PublishSubject<Void>()
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.attributedText = NSAttributedString.build(
@@ -46,7 +51,6 @@ class AddPaperHeaderView: UIView {
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
 }
 
 private extension AddPaperHeaderView {
@@ -77,4 +81,11 @@ private extension AddPaperHeaderView {
         ])
     }
 
+    private func bind() {
+        barRightButton.rx.tap
+            .bind(onNext: { [weak self] in
+                self?.didTappedDone.onNext(())
+            })
+            .disposed(by: disposeBag)
+    }
 }

@@ -38,6 +38,7 @@ class AddPaperContentView: UIView {
 
     private let disposeBag = DisposeBag()
     let viewModel = AddPaperContentViewModel()
+    var currentSelectedCell: AddPaperCell?
 
     // MARK: - UI Property
 

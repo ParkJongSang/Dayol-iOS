@@ -208,6 +208,14 @@ class DYTestData {
         pageList[0].paperList = paperList
         pageListSubject.onNext(pageList)
     }
+    
+    func addPage(_ model: DiaryInnerModel.PaperModel) {
+        guard var paperList = pageList[safe: 0]?.paperList else { return }
+        
+        paperList.append(model)
+        pageList[0].paperList = paperList
+        pageListSubject.onNext(pageList)
+    }
 
     func deleteDiary(_ diary: DiaryInnerModel) {
         guard let index = pageList.firstIndex(where: { $0.diaryID == diary.diaryID }) else { return }

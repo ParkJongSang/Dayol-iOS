@@ -75,7 +75,6 @@ extension AddPaperContentView {
                             left: sideInset,
                             bottom: Design.bottomSideInset,
                             right: sideInset)
-
     }
 
 }
@@ -124,7 +123,8 @@ extension AddPaperContentView: UICollectionViewDataSource {
 extension AddPaperContentView: UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        // TODO: - 셀렉트 로직 추가
+        guard let cell = viewModel.cellModel(indexPath, paperStyle: currentTabType) else { return }
+        viewModel.selectCell(cell)
     }
 
 }

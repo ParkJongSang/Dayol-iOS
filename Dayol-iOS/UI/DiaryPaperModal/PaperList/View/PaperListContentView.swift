@@ -28,6 +28,7 @@ class PaperListContentView: UIView {
 
     let disposeBag = DisposeBag()
     let didSelectItem = PublishSubject<Int>()
+    let didSelectAddCell = PublishSubject<Void>()
     
     private let papers: [PaperModalModel.PaperListCellModel]
     private var shouldShowInfoLabel: Bool {

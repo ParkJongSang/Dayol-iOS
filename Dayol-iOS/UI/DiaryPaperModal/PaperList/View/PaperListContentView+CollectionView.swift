@@ -29,13 +29,13 @@ extension PaperListContentView: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 
-        if indexPath.row == pepersCount  {
+        if indexPath.item == pepersCount  {
             // ' + ' 버튼이 있는 셀
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PaperListAddCell.identifier, for: indexPath)
             if let addCell = cell as? PaperListAddCell {
                 addCell.addButton.rx.tap
-                    .bind {
-                        // add cell action
+                    .bind { [weak self] in
+                        self?.didSelectAddCell.onNext(())
                     }
                     .disposed(by: disposeBag)
             }
