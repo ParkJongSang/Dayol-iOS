@@ -34,6 +34,7 @@
 		3452671325DD66F400EC6F9D /* DataBackupExportContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3452671225DD66F400EC6F9D /* DataBackupExportContentView.swift */; };
 		346779C425B47C6F001427F8 /* DiaryEditViewController+PhotoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 346779C325B47C6F001427F8 /* DiaryEditViewController+PhotoPicker.swift */; };
 		34733DC125D189F500C3A997 /* DetailSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34733DC025D189F500C3A997 /* DetailSettingsViewController.swift */; };
+		34788856261E0B4B00692ED7 /* LassoInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34788855261E0B4B00692ED7 /* LassoInfoView.swift */; };
 		34A11A4725ADC3CA00678F98 /* PaperModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A11A4625ADC3CA00678F98 /* PaperModalViewController.swift */; };
 		34A11A4B25ADC8F700678F98 /* UnderLineButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A11A4A25ADC8F700678F98 /* UnderLineButton.swift */; };
 		34A11A4F25ADC93300678F98 /* AddPaperContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A11A4E25ADC93300678F98 /* AddPaperContentView.swift */; };
@@ -180,6 +181,7 @@
 		3452671225DD66F400EC6F9D /* DataBackupExportContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBackupExportContentView.swift; sourceTree = "<group>"; };
 		346779C325B47C6F001427F8 /* DiaryEditViewController+PhotoPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DiaryEditViewController+PhotoPicker.swift"; sourceTree = "<group>"; };
 		34733DC025D189F500C3A997 /* DetailSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailSettingsViewController.swift; sourceTree = "<group>"; };
+		34788855261E0B4B00692ED7 /* LassoInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LassoInfoView.swift; sourceTree = "<group>"; };
 		34A11A4625ADC3CA00678F98 /* PaperModalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperModalViewController.swift; sourceTree = "<group>"; };
 		34A11A4A25ADC8F700678F98 /* UnderLineButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnderLineButton.swift; sourceTree = "<group>"; };
 		34A11A4E25ADC93300678F98 /* AddPaperContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPaperContentView.swift; sourceTree = "<group>"; };
@@ -413,6 +415,14 @@
 			path = DataBackup;
 			sourceTree = "<group>";
 		};
+		34788854261E0B1F00692ED7 /* Lasso */ = {
+			isa = PBXGroup;
+			children = (
+				34788855261E0B4B00692ED7 /* LassoInfoView.swift */,
+			);
+			path = Lasso;
+			sourceTree = "<group>";
+		};
 		34A11A4425ADC35500678F98 /* DiaryPaperModal */ = {
 			isa = PBXGroup;
 			children = (
@@ -495,8 +505,9 @@
 		34BB085C261217690000377E /* ToolBarContent */ = {
 			isa = PBXGroup;
 			children = (
-				34C7B3672619749B00BC6A28 /* TextStyle */,
+				34788854261E0B1F00692ED7 /* Lasso */,
 				34C7B3662619748C00BC6A28 /* Erase */,
+				34C7B3672619749B00BC6A28 /* TextStyle */,
 			);
 			path = ToolBarContent;
 			sourceTree = "<group>";
@@ -1321,6 +1332,7 @@
 				DADD0A1925A72907004D6CF0 /* DiaryPaperViewerViewController.swift in Sources */,
 				DAD66746259C691300E8F59A /* DYNavigationItemCreator.swift in Sources */,
 				DACE3B202587AEB90067467B /* PasswordButton.swift in Sources */,
+				34788856261E0B4B00692ED7 /* LassoInfoView.swift in Sources */,
 				3446621F25C1A07A00656775 /* CornellPaper.swift in Sources */,
 				CE8DCC942590ECE8007738EA /* DiaryListCell.swift in Sources */,
 				CE8DCB11258FA502007738EA /* DiaryListViewModel.swift in Sources */,

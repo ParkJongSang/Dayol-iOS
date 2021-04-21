@@ -48,6 +48,7 @@ class DYModalViewController: UIViewController {
     // MARK: - Default Private UI
 
     private var contentViewBottomConstraint = NSLayoutConstraint()
+    private var contentViewHeightConstraint = NSLayoutConstraint()
     private let dimView = UIView()
     private let containerView = UIView()
     private let headerArea = UIView()
@@ -111,10 +112,6 @@ class DYModalViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         super.modalTransitionStyle = .crossDissolve
         super.modalPresentationStyle = .overCurrentContext
-
-        setupSubviews()
-        setupConstraints()
-        setupGestureRecognizer()
     }
 
     required init?(coder: NSCoder) {
@@ -122,6 +119,13 @@ class DYModalViewController: UIViewController {
     }
 
     // MARK: - View Cycle
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupSubviews()
+        setupConstraints()
+        setupGestureRecognizer()
+    }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -131,6 +135,17 @@ class DYModalViewController: UIViewController {
     override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
         dismissContentView(animated: flag) {
             super.dismiss(animated: false, completion: completion)
+        }
+    }
+
+    override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+
+        let previousHeight = contentViewBottomConstraint.constant
+
+        if previousHeight != containerViewHeight {
+            contentViewBottomConstraint.constant = containerViewHeight
+            contentViewHeightConstraint.constant = containerViewHeight
         }
     }
 
@@ -204,7 +219,7 @@ extension DYModalViewController {
         case .changed:
             panningContentView(recog)
         case .ended, .cancelled, .failed:
-            finnishPanning(recog)
+            finishPanning(recog)
         default: break
         }
     }
@@ -220,7 +235,7 @@ extension DYModalViewController {
         }
     }
 
-    private func finnishPanning(_ recog: UIPanGestureRecognizer) {
+    private func finishPanning(_ recog: UIPanGestureRecognizer) {
 
         defer {
             lastMoved = .greatestFiniteMagnitude
@@ -319,6 +334,7 @@ extension DYModalViewController {
                                                          attribute: .bottom,
                                                          multiplier: 1,
                                                          constant: containerViewHeight)
+        contentViewHeightConstraint = containerView.heightAnchor.constraint(equalToConstant: containerViewHeight)
 
         NSLayoutConstraint.activate([
             dimView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -328,7 +344,7 @@ extension DYModalViewController {
             containerView.topAnchor.constraint(equalTo: dimView.bottomAnchor, constant: -Design.cornerRadius),
             containerView.leadingAnchor.constraint(equalTo: dimView.leadingAnchor),
             containerView.trailingAnchor.constraint(equalTo: dimView.trailingAnchor),
-            containerView.heightAnchor.constraint(equalToConstant: containerViewHeight),
+            contentViewHeightConstraint,
             contentViewBottomConstraint,
 
             headerArea.topAnchor.constraint(equalTo: containerView.topAnchor),

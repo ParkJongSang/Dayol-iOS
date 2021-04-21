@@ -62,6 +62,10 @@ enum Assets {
         enum ToolBar {
             static let info = UIImage(named: "toolBar_info")
 
+            enum Lasso {
+                static let info = UIImage(named: "toolBar_lasso_info")
+            }
+
             enum Erase: String {
                 case small
                 case medium

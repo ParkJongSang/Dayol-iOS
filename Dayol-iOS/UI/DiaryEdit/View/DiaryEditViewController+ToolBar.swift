@@ -20,12 +20,16 @@ private enum Text {
     static var eraseTitle: String {
         return "edit_eraser_title".localized
     }
+    static var lassoTitle: String {
+        return "edit_lasso_title".localized
+    }
 }
 
 extension DiaryEditViewController {
 
     func toolBarBind() {
         accessoryViewBind()
+        lassoToolBind()
         eraseBind()
         textFieldBind()
         photoBind()
@@ -55,6 +59,24 @@ extension DiaryEditViewController {
                                                    lineSpacing: 26,
                                                    font: .sandolGodic)
                 modalVC.contentView = TextStyleView(viewModel: viewModel)
+                self.presentCustomModal(modalVC)
+            }
+            .disposed(by: disposeBag)
+    }
+
+    private func lassoToolBind() {
+        toolBar.snareButton.rx.tap
+            .bind { [weak self] in
+                guard let self = self else { return }
+                guard self.currentTool == .snare else {
+                    self.currentTool = .snare
+                    return
+                }
+                let configuration = DYModalConfiguration(dimStyle: .black, modalStyle: .small)
+                let modalVC = DYModalViewController(configure: configuration,
+                                                    title: Text.lassoTitle,
+                                                    hasDownButton: true)
+                modalVC.contentView = LassoInfoView()
                 self.presentCustomModal(modalVC)
             }
             .disposed(by: disposeBag)
