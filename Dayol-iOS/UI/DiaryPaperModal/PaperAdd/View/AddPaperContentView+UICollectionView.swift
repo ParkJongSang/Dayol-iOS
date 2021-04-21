@@ -123,8 +123,8 @@ extension AddPaperContentView: UICollectionViewDataSource {
 extension AddPaperContentView: UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = viewModel.cellModel(indexPath, paperStyle: currentTabType) else { return }
-        viewModel.selectCell(cell)
+        guard let cellModel = viewModel.cellModel(indexPath, paperStyle: currentTabType) else { return }
+        viewModel.selectCell(model: cellModel)
     }
 
 }

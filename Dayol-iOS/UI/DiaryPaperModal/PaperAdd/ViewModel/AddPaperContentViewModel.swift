@@ -21,7 +21,7 @@ class AddPaperContentViewModel {
         }
     }
     
-    func selectCell(_ cell: PaperModalModel.AddPaperCellModel) {
+    func selectCell(model cell: PaperModalModel.AddPaperCellModel) {
         selectedPaper = cell
     }
     
