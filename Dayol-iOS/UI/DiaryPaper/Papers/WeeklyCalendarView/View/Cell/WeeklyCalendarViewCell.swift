@@ -24,16 +24,25 @@ private enum Design {
     static let dayFont = UIFont.systemFont(ofSize: 13, weight: .regular)
     
     static let dayLabelTop: CGFloat = 8
-    static let dayLabelLeft: CGFloat = isIPad ? 10 : 8
+    static let dayLabelLeading: CGFloat = 8
+    static let dayLabelHeight: CGFloat = 15
     
     static let weeklyLabelTop: CGFloat = 8
-    static let weeklyLabelLeft: CGFloat = isIPad ? 10 : 8
+    static let weeklyLabelLeading: CGFloat = 8
+    static let weeklyLabelHeight: CGFloat = 15
     
-    static let weekdayLabelLeft: CGFloat = 8
+    static let weekdayLabelLeading: CGFloat = 8
+    static let weekdayLabelHeight: CGFloat = 13
     // TODO: Event Design
     
     static let separatorLineColor: UIColor = UIColor(decimalRed: 233, green: 233, blue: 233)
     static let separatorLineWidth: CGFloat = 1
+
+    static let textInset: UIEdgeInsets = .init(top: 5, left: 5, bottom: -5, right: -5)
+}
+
+private enum Text: String {
+    case weekly = "WEEKLY"
 }
 
 class WeeklyCalendarViewCell: UICollectionViewCell {
@@ -69,6 +78,7 @@ class WeeklyCalendarViewCell: UICollectionViewCell {
         let label = UILabel()
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 1
         
         return label
     }()
@@ -77,6 +87,7 @@ class WeeklyCalendarViewCell: UICollectionViewCell {
         let label = UILabel()
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 1
         
         return label
     }()
@@ -85,8 +96,18 @@ class WeeklyCalendarViewCell: UICollectionViewCell {
         let label = UILabel()
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 1
         
         return label
+    }()
+
+    private(set) var textView: UITextView = {
+        let textView = UITextView()
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.isScrollEnabled = false
+        textView.textContainer.lineBreakMode = .byCharWrapping
+
+        return textView
     }()
     
     init() {
@@ -105,7 +126,7 @@ class WeeklyCalendarViewCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        setFirstCell(true)
+        textView.text = ""
         disposeBag = DisposeBag()
     }
     
@@ -115,38 +136,48 @@ class WeeklyCalendarViewCell: UICollectionViewCell {
         contentView.addSubview(weekdayLabel)
         contentView.addSubview(rightSeparatorLine)
         contentView.addSubview(topSeparatorLine)
-        setConstraint()
+        contentView.addSubview(textView)
+        setupConstraints()
 
         setupGestureRecognizer()
     }
     
-    private func setConstraint() {
+    private func setupConstraints() {
         NSLayoutConstraint.activate([
             dayLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Design.dayLabelTop),
-            dayLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: Design.dayLabelLeft),
+            dayLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Design.dayLabelLeading),
+            dayLabel.heightAnchor.constraint(equalToConstant: Design.dayLabelHeight),
             
             weeklyLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Design.weeklyLabelTop),
-            weeklyLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: Design.weeklyLabelLeft),
+            weeklyLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Design.weeklyLabelLeading),
+            weeklyLabel.heightAnchor.constraint(equalToConstant: Design.weeklyLabelHeight),
             
-            weekdayLabel.leftAnchor.constraint(equalTo: dayLabel.rightAnchor, constant: Design.weekdayLabelLeft),
+            weekdayLabel.leadingAnchor.constraint(equalTo: dayLabel.trailingAnchor, constant: Design.weekdayLabelLeading),
             weekdayLabel.bottomAnchor.constraint(equalTo: dayLabel.bottomAnchor),
+            weekdayLabel.heightAnchor.constraint(equalToConstant: Design.weekdayLabelHeight),
             
-            rightSeparatorLine.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+            rightSeparatorLine.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             rightSeparatorLine.topAnchor.constraint(equalTo: contentView.topAnchor),
             rightSeparatorLine.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             rightSeparatorLine.widthAnchor.constraint(equalToConstant: Design.separatorLineWidth),
             
-            topSeparatorLine.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+            topSeparatorLine.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             topSeparatorLine.topAnchor.constraint(equalTo: contentView.topAnchor),
-            topSeparatorLine.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-            topSeparatorLine.heightAnchor.constraint(equalToConstant: Design.separatorLineWidth)
+            topSeparatorLine.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            topSeparatorLine.heightAnchor.constraint(equalToConstant: Design.separatorLineWidth),
+
+            textView.topAnchor.constraint(equalTo: dayLabel.bottomAnchor, constant: Design.textInset.top),
+            textView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Design.textInset.left),
+            textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: Design.textInset.right),
+            textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: Design.textInset.bottom)
         ])
     }
 
-    func configure(model: WeeklyCalendarDataModel) {
+    func configure(model: WeeklyCalendarDataModel, text: NSAttributedString) {
         dayLabel.attributedText = attributedString(type: .day, model: model)
         weeklyLabel.attributedText = attributedString(type: .weekly, model: model)
         weekdayLabel.attributedText = attributedString(type: .weekday, model: model)
+        textView.attributedText = text
         
         setFirstCell(false)
     }
@@ -155,6 +186,7 @@ class WeeklyCalendarViewCell: UICollectionViewCell {
         dayLabel.isHidden = isFirst
         weekdayLabel.isHidden = isFirst
         weeklyLabel.isHidden = !isFirst
+        textView.isHidden = isFirst
     }
 
     private func setupGestureRecognizer() {

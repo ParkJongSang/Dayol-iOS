@@ -10,23 +10,33 @@ import RxSwift
 import RxCocoa
 
 private enum Design {
-    static func headerHeight(style: Paper.PaperOrientation) -> CGFloat {
-        switch style {
-        case .portrait: return 125
-        case .landscape: return 81
-        }
-    }
+    static let numberOfSection: Int = 1
+    static let numberOfRow: Int = 4
+    static let numberOfItemPerRow: Int = 2
+    static let numberOfItem: Int = 8
+
+    //TODO: Delete
+    static let dummyFont: UIFont = .appleRegular(size: 15)
 }
 
 class WeeklyCalendarView: BasePaper {
+    private(set) var maxHeightPerRowDict: [Int: CGFloat] = [Int: CGFloat]()
+
     let showAddSchedule = PublishSubject<Date>()
     let showSelectPaper = PublishSubject<Void>()
 
     private var dayModel: [WeeklyCalendarDataModel]?
     var disposeBag = DisposeBag()
-    
-    private let headerView: MonthlyCalendarHeaderView = {
-        let header = MonthlyCalendarHeaderView(month: .january)
+
+    private let dummyModel: [String] = [
+        "TEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST",
+        "TEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTEST",
+        "TEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTES",
+        "TEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST"
+    ]
+
+    private let headerView: WeeklyCalendarHeaderView = {
+        let header = WeeklyCalendarHeaderView(month: .january)
         header.translatesAutoresizingMaskIntoConstraints = false
         
         return header
@@ -63,16 +73,14 @@ class WeeklyCalendarView: BasePaper {
 
     
     private func setupConstraints() {
-        guard let orientation = self.orientation else { return }
         NSLayoutConstraint.activate([
             headerView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            headerView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-            headerView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-            headerView.heightAnchor.constraint(equalToConstant: Design.headerHeight(style: orientation)),
+            headerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            headerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             
             collectionView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
-            collectionView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-            collectionView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
     }
@@ -135,8 +143,12 @@ extension WeeklyCalendarView: UICollectionViewDataSource {
               let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WeeklyCalendarViewCell.identifier, for: indexPath) as? WeeklyCalendarViewCell else {
             return UICollectionViewCell()
         }
-        
-        cell.configure(model: model)
+
+
+        let text = dummyModel[safe: indexPath.item - 1] ?? ""
+        let attributedText = NSAttributedString.build(text: text, font: Design.dummyFont, align: .natural, letterSpacing: 0.0, foregroundColor: .black)
+        cell.configure(model: model, text: attributedText)
+
         if model.isFirst {
             cell.setFirstCell(true)
         }
@@ -164,6 +176,45 @@ extension WeeklyCalendarView: UICollectionViewDataSource {
 
 extension WeeklyCalendarView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.frame.width / 2, height: collectionView.frame.height / 4)
+        let collectionViewSize = collectionView.frame.size
+        let row = Int(CGFloat(indexPath.item) * CGFloat(0.5))
+        let width = collectionViewSize.width * 0.5
+
+        let height = maxHeightPerRow(collectionView, at: row)
+        return CGSize(width: width, height: height)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return .zero
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return .zero
+    }
+
+    private func maxHeightPerRow(_ collectionView: UICollectionView, at row: Int) -> CGFloat {
+        guard maxHeightPerRowDict[row] == nil else {
+            return maxHeightPerRowDict[row] ?? 0
+        }
+
+        let itemPerRow = Design.numberOfItemPerRow
+        let width = collectionView.frame.size.width * 0.5
+        let defaultHeight = collectionView.frame.size.height * 0.25
+        var estimatedHeight = defaultHeight
+
+        for index in 0..<itemPerRow {
+            let modelIndex = (row * itemPerRow) + index
+            let text = dummyModel[safe: modelIndex - 1] ?? ""
+            let attributedText = NSAttributedString.build(text: text, font: Design.dummyFont, align: .natural, letterSpacing: 0.0, foregroundColor: .black)
+            let textHeight: CGFloat = PaperTextableCell.estimatedHeight(
+                width: width,
+                attributedText: attributedText
+            )
+            estimatedHeight = max(estimatedHeight, textHeight)
+        }
+
+        maxHeightPerRowDict[row] = estimatedHeight
+
+        return estimatedHeight
     }
 }
