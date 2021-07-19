@@ -24,6 +24,7 @@ final class PaperTextableCell: UICollectionViewCell {
         let textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.isScrollEnabled = false
+        textView.textContainer.lineBreakMode = .byCharWrapping
 
         return textView
     }()

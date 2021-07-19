@@ -18,8 +18,8 @@ private enum Design {
 
     static func titleAreaHeight(orentation: Paper.PaperOrientation) -> CGFloat {
         switch orentation {
-        case .landscape: return 50.0
-        case .portrait: return 64.0
+        case .landscape: return 83.0
+        case .portrait: return 79.0
         }
     }
 
@@ -38,88 +38,163 @@ private enum Design {
             return Int(paperSize.height / Self.lineHeight) + 1
         }
     }
+
+    static let numberOfSection: Int = 1
+    static let numberOfRow: Int = 15
+    static let numberOfItemPerRow: Int = 2
+    static let numberOfItem: Int = 30
+
+    static let defaultHeight: CGFloat = 31
+    static let smallCellWidth: CGFloat = isIPad ? 200 : 100
+    static let bigCellWidth: CGFloat = isIPad ? 824 : 275
+
+    static func smallCellWidth(orientation: Paper.PaperOrientation) -> CGFloat {
+        switch orientation {
+        case .landscape:
+            return 200
+        case .portrait:
+            return 100
+        }
+    }
+
+    static func bigCellWidth(orientation: Paper.PaperOrientation) -> CGFloat {
+        switch orientation {
+        case .landscape:
+            return 824
+        case .portrait:
+            return 275
+        }
+    }
+
+    //TODO: Delete
+    static let dummyFont: UIFont = .appleRegular(size: 15)
 }
 
 class CornellPaperView: BasePaper {
-    private let cornellImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
+    private(set) var maxHeightPerRowDict: [Int: CGFloat] = [Int: CGFloat]()
+
+    //TODO: Delete
+    private let dummyModel: [String] = [
+        "TESTT",
+        "TES",
+        "TEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTES",
+        "TEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST"
+    ]
+
+    private let redLineView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = Design.redLineColor
+
+        return view
     }()
 
-    private(set) var isFirstPage: Bool = true
+    private let collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = .clear
+
+        return collectionView
+    }()
     
     override func configure(viewModel: PaperViewModel, orientation: Paper.PaperOrientation) {
         super.configure(viewModel: viewModel, orientation: orientation)
-        cornellImageView.image = getCornellImage(isFirstPage: isFirstPage)
-        cornellImageView.contentMode = .topLeft
-        contentView.addSubViewPinEdge(cornellImageView)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(PaperTextableCell.self)
+        contentView.addSubview(collectionView)
+        contentView.addSubview(redLineView)
+        setupConstraints()
+    }
+
+    private func setupConstraints() {
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Design.titleAreaHeight(orentation: orientation ?? .landscape)),
+            collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+
+            redLineView.widthAnchor.constraint(equalToConstant: Design.lineWidth),
+            redLineView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Design.smallCellWidth),
+            redLineView.topAnchor.constraint(equalTo: collectionView.topAnchor),
+            redLineView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+        ])
     }
 }
 
-private extension CornellPaperView {
-    func getCornellImage(isFirstPage: Bool) -> UIImage? {
-        guard let orientation = self.orientation else { return nil }
+// MARK: - CollectionView Delegate
 
-        let paperSize = PaperOrientationConstant.size(orentantion: orientation)
-        UIGraphicsBeginImageContextWithOptions(paperSize, false, 0.0)
+extension CornellPaperView: UICollectionViewDelegate {
 
-        guard let context = UIGraphicsGetCurrentContext() else {
-            UIGraphicsEndImageContext()
-            return nil
-        }
+}
 
-        context.setLineWidth(Design.lineWidth)
-        context.setLineCap(.square)
+// MARK: - CollectionView DataSource
 
-        // MARK: Draw Each base Line
-
-        context.setStrokeColor(Design.lineColor.cgColor)
-
-        let positionMargin = isFirstPage ? Design.titleAreaHeight(orentation: orientation) : 0
-
-        for row in 0..<Design.numberOfLineInPage(orientation: orientation, isFirstPage: isFirstPage) + 1 {
-            let positionY = row * Int(Design.lineHeight) + Int(positionMargin)
-            let startPoint = CGPoint(x: 0, y: positionY)
-            let endPoint = CGPoint(x: Int(paperSize.width), y: positionY)
-
-            context.move(to: startPoint)
-            context.addLine(to: endPoint)
-        }
-
-        context.strokePath()
-
-        // MARK: Draw Red Line
-
-        context.setStrokeColor(Design.redLineColor.cgColor)
-
-        let positionX = Design.redLineOriginX(orentation: orientation)
-        let startPoint = CGPoint(x: positionX, y: positionMargin)
-        let endPoint = CGPoint(x: positionX, y: paperSize.height)
-
-        context.move(to: startPoint)
-        context.addLine(to: endPoint)
-
-        context.strokePath()
-
-        // MARK: Draw Header If Needed
-
-        if isFirstPage {
-            context.setStrokeColor(Design.headerSeparatorColor.cgColor)
-
-            let positionY = Design.titleAreaHeight(orentation: orientation)
-            let startPoint = CGPoint(x: 0, y: positionY)
-            let endPoint = CGPoint(x: paperSize.width, y: positionY)
-
-            context.move(to: startPoint)
-            context.addLine(to: endPoint)
-
-            context.strokePath()
-        }
-
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return image
+extension CornellPaperView: UICollectionViewDataSource {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return Design.numberOfSection
     }
 
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return Design.numberOfItem
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(PaperTextableCell.self, for: indexPath)
+        let text = dummyModel[safe: indexPath.item] ?? ""
+        //TODO: Modify DYTextView
+        let attributedText = NSAttributedString.build(text: text, font: Design.dummyFont, align: .natural, letterSpacing: 0.0, foregroundColor: .black)
+
+        cell.configure(attributedText: attributedText)
+        return cell
+    }
+}
+
+// MARK: - CollectionView Flowlayout Delegate
+
+extension CornellPaperView: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        guard let orientation = self.orientation else { return .zero }
+        let row = Int(CGFloat(indexPath.item) * CGFloat(0.5))
+        let width = indexPath.item % 2 == 0 ? Design.smallCellWidth(orientation: orientation) : Design.bigCellWidth(orientation: orientation)
+
+        let height = maxHeightPerRow(collectionView, at: row)
+        return CGSize(width: width, height: height)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return .zero
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return .zero
+    }
+
+    private func maxHeightPerRow(_ collectionView: UICollectionView, at row: Int) -> CGFloat {
+        guard maxHeightPerRowDict[row] == nil else {
+            return maxHeightPerRowDict[row] ?? 0
+        }
+
+        guard let orientation = self.orientation else { return .zero }
+
+        let itemPerRow = Design.numberOfItemPerRow
+        let defaultHeight = Design.defaultHeight
+        var estimatedHeight = defaultHeight
+
+        for index in 0..<itemPerRow {
+            let modelIndex = (row * itemPerRow) + index
+            let width = modelIndex % 2 == 0 ? Design.smallCellWidth(orientation: orientation) : Design.bigCellWidth(orientation: orientation)
+            let text = dummyModel[safe: modelIndex] ?? ""
+            let textHeight: CGFloat = PaperTextableCell.estimatedHeight(
+                width: width,
+                attributedText: NSAttributedString(string: text)
+            )
+            estimatedHeight = max(estimatedHeight, textHeight)
+        }
+
+        maxHeightPerRowDict[row] = estimatedHeight
+
+        return estimatedHeight
+    }
 }

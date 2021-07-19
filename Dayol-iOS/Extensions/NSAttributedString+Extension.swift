@@ -31,9 +31,12 @@ extension NSAttributedString {
     }
 
     func height(with width: CGFloat) -> CGFloat {
-        let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
-        let boundingBox = boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, context: nil)
+        let label =  UILabel(frame: CGRect(x: 0, y: 0, width: width, height: .greatestFiniteMagnitude))
+        label.numberOfLines = 0
+        label.lineBreakMode = .byCharWrapping
+        label.attributedText = self
+        label.sizeToFit()
 
-        return ceil(boundingBox.height)
+        return label.frame.height
     }
 }
