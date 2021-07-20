@@ -102,14 +102,14 @@ enum PaperType: String {
 
     var identifier: String {
         switch self {
-        case .monthly: return MonthlyCalendarView.className
+        case .monthly: return MonthlyCalendarPaperView.className
         case .weekly: return WeeklyCalendarView.className
         case .daily: return DailyPaperView.className
         case .cornell: return CornellPaperView.className
         case .muji: return MujiPaperView.className
         case .grid: return GridPaperView.className
         case .quartet: return QuartetPaperView.className
-        case .tracker: return BasePaper.className
+        case .tracker: return MonthlyTrackerPaperView.className
         }
     }
 }

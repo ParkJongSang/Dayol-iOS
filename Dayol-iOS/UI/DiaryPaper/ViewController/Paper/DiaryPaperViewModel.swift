@@ -72,4 +72,8 @@ extension DiaryPaperViewModel {
     var isFavorite: Bool {
         return paper.isFavorite
     }
+
+    var date: Date {
+        return paper.date ?? .now
+    }
 }

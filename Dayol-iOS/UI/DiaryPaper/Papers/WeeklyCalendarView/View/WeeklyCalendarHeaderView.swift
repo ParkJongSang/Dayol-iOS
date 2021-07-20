@@ -23,7 +23,7 @@ private enum Design {
     static let buttonImage = UIImage(named: "downArrow")
 }
 
-class WeeklyCalendarHeaderView: UIView {
+class WeeklyCalendarHeaderView: UICollectionReusableView {
     private let monthLabel: UILabel = {
         let label = UILabel()
         label.textColor = Design.mohthFontColor
@@ -40,10 +40,9 @@ class WeeklyCalendarHeaderView: UIView {
         
         return button
     }()
-    
-    init(month: Month) {
-        super.init(frame: .zero)
-        self.month = month
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         initView()
     }
     
@@ -71,16 +70,17 @@ class WeeklyCalendarHeaderView: UIView {
 }
 
 extension WeeklyCalendarHeaderView {
-    var month: Month {
+    var month: Month? {
         get {
-            return Month.allCases.first { $0.asString == monthLabel.attributedText?.string } ?? .january
+            return Month.allCases.first { $0.asString == monthLabel.attributedText?.string }
         }
         set {
+            guard let stringValue = newValue?.asString else { return }
             let attributes: [NSAttributedString.Key: Any] = [
                 .font: Design.monthFont,
                 .kern: Design.monthLetterSpace
             ]
-            let attributedText = NSMutableAttributedString(string: newValue.asString, attributes: attributes)
+            let attributedText = NSMutableAttributedString(string: stringValue, attributes: attributes)
             monthLabel.attributedText = attributedText
         }
     }

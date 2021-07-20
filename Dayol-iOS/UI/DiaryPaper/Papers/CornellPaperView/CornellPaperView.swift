@@ -70,7 +70,7 @@ private enum Design {
     static let dummyFont: UIFont = .appleRegular(size: 15)
 }
 
-class CornellPaperView: BasePaper {
+class CornellPaperView: PaperView {
     private(set) var maxHeightPerRowDict: [Int: CGFloat] = [Int: CGFloat]()
 
     //TODO: Delete
@@ -89,37 +89,40 @@ class CornellPaperView: BasePaper {
         return view
     }()
 
-    private let collectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .clear
-
-        return collectionView
-    }()
-    
-    override func configure(viewModel: PaperViewModel, orientation: Paper.PaperOrientation) {
-        super.configure(viewModel: viewModel, orientation: orientation)
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.register(PaperTextableCell.self)
-        contentView.addSubview(collectionView)
-        contentView.addSubview(redLineView)
+    override init(orientation: Paper.PaperOrientation) {
+        super.init(orientation: orientation)
+        addSubviews()
         setupConstraints()
+        setupCollectionView()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func addSubviews() {
+        addSubview(collectionView)
+        addSubview(redLineView)
     }
 
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Design.titleAreaHeight(orentation: orientation ?? .landscape)),
-            collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            collectionView.topAnchor.constraint(equalTo: topAnchor, constant: Design.titleAreaHeight(orentation: orientation)),
+            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: bottomAnchor),
 
             redLineView.widthAnchor.constraint(equalToConstant: Design.lineWidth),
-            redLineView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Design.smallCellWidth),
+            redLineView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.smallCellWidth),
             redLineView.topAnchor.constraint(equalTo: collectionView.topAnchor),
-            redLineView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+            redLineView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+    }
+
+    private func setupCollectionView() {
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(PaperTextableCell.self)
     }
 }
 
@@ -155,7 +158,6 @@ extension CornellPaperView: UICollectionViewDataSource {
 
 extension CornellPaperView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        guard let orientation = self.orientation else { return .zero }
         let row = Int(CGFloat(indexPath.item) * CGFloat(0.5))
         let width = indexPath.item % 2 == 0 ? Design.smallCellWidth(orientation: orientation) : Design.bigCellWidth(orientation: orientation)
 
@@ -175,8 +177,6 @@ extension CornellPaperView: UICollectionViewDelegateFlowLayout {
         guard maxHeightPerRowDict[row] == nil else {
             return maxHeightPerRowDict[row] ?? 0
         }
-
-        guard let orientation = self.orientation else { return .zero }
 
         let itemPerRow = Design.numberOfItemPerRow
         let defaultHeight = Design.defaultHeight

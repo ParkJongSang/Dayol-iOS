@@ -13,6 +13,7 @@ enum DateType {
     case yearMonthDay
     case yearMonth
     case year
+    case monthDay
     case month
     case day
     case time
@@ -31,6 +32,8 @@ enum DateType {
             dateForamtter.dateFormat = "yyyy.M"
         case .year:
             dateForamtter.dateFormat = "yyyy"
+        case .monthDay:
+            dateForamtter.dateFormat = "M.dd"
         case .month:
             dateForamtter.dateFormat = "M"
         case .day:

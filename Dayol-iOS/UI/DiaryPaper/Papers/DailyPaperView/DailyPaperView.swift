@@ -32,148 +32,46 @@ private enum Design {
     static let dummyFont: UIFont = .appleRegular(size: 15)
 }
 
-class DailyPaperView: BasePaper {
+class DailyPaperView: PaperView {
     private(set) var maxHeightPerRowDict: [Int: CGFloat] = [Int: CGFloat]()
-    
+
+    private let viewModel: DailyPaperViewModel
     private let disposeBag = DisposeBag()
 
     //TODO: Delete
     private let dummyModel: String = "TEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST"
 
-    private let titleArea: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        
-        return view
-    }()
-    
-    private let dateLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        return label
-    }()
-    
-    private let dayLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        return label
-    }()
-
-    private let separatorView: UIView = {
-        let view = UIView()
-        view.backgroundColor = Design.separatorColor
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-
-    private let collectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .clear
-
-        return collectionView
-    }()
-    
-    override func configure(viewModel: PaperViewModel, orientation: Paper.PaperOrientation) {
-        super.configure(viewModel: viewModel, orientation: orientation)
-        titleArea.addSubview(dateLabel)
-        titleArea.addSubview(dayLabel)
-        titleArea.addSubview(separatorView)
-
-        collectionView.delegate = self
-        collectionView.dataSource = self
-
-        collectionView.register(PaperTextableCell.self)
-
-        contentView.addSubview(titleArea)
-        contentView.addSubview(collectionView)
-        contentView.backgroundColor = CommonPaperDesign.defaultBGColor
-        
+    init(viewModel: DailyPaperViewModel,orientation: Paper.PaperOrientation) {
+        self.viewModel = viewModel
+        super.init(orientation: orientation)
+        addSubviews()
         setupConstraints()
-        
-        bindEvent()
+        setupCollectionView()
     }
-    
-    func bindEvent() {
-        guard let viewModel = viewModel as? DailyPaperViewModel else { return }
 
-        viewModel.date
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] dateString in
-                self?.dateText = dateString
-            })
-            .disposed(by: disposeBag)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
-        viewModel.day
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] day in
-                self?.dayText = day
-            })
-            .disposed(by: disposeBag)
+    private func addSubviews() {
+        addSubview(collectionView)
     }
 
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            dateLabel.centerYAnchor.constraint(equalTo: titleArea.centerYAnchor),
-            dateLabel.leadingAnchor.constraint(equalTo: titleArea.leadingAnchor,
-                                               constant: Design.dateLeftMargin),
-
-            dayLabel.firstBaselineAnchor.constraint(equalTo: dateLabel.firstBaselineAnchor),
-            dayLabel.leadingAnchor.constraint(equalTo: dateLabel.trailingAnchor,
-                                               constant: Design.dayLeftMargin),
-
-            separatorView.leadingAnchor.constraint(equalTo: titleArea.leadingAnchor),
-            separatorView.trailingAnchor.constraint(equalTo: titleArea.trailingAnchor),
-            separatorView.bottomAnchor.constraint(equalTo: titleArea.bottomAnchor),
-            separatorView.heightAnchor.constraint(equalToConstant: Design.separatorHeight),
-
-            titleArea.topAnchor.constraint(equalTo: contentView.topAnchor),
-            titleArea.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            titleArea.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            titleArea.heightAnchor.constraint(equalToConstant: Design.titleAreaHeight),
-
-            collectionView.topAnchor.constraint(equalTo: titleArea.bottomAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+            collectionView.topAnchor.constraint(equalTo: topAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
 
-}
+    private func setupCollectionView() {
+        collectionView.delegate = self
+        collectionView.dataSource = self
 
-private extension DailyPaperView {
-    var dateText: String? {
-        get {
-            return dateLabel.attributedText?.string
-        }
-        set {
-            guard let dateString = newValue else { return }
-            dateLabel.attributedText = NSAttributedString.build(text: dateString,
-                                                                font: Design.dateFont,
-                                                                align: .left,
-                                                                letterSpacing: Design.dateSpacing,
-                                                                foregroundColor: Design.titleColor)
-            dateLabel.sizeToFit()
-        }
-    }
-
-    var dayText: DailyPaperViewModel.Day? {
-        get {
-            guard let rawValue = dayLabel.attributedText?.string else { return nil }
-            return DailyPaperViewModel.Day(rawValue: rawValue)
-        }
-        set {
-            guard let day = newValue else { return }
-            dayLabel.attributedText = NSAttributedString.build(text: day.rawValue,
-                                                               font: Design.dayFont,
-                                                               align: .left,
-                                                               letterSpacing: Design.daySpacing,
-                                                               foregroundColor: Design.titleColor)
-            dayLabel.sizeToFit()
-        }
+        collectionView.register(PaperTextableCell.self)
+        collectionView.registerHeader(DailyPaperHeaderView.self)
     }
 }
 
@@ -186,6 +84,14 @@ extension DailyPaperView: UICollectionViewDelegate {
 // MARK: - CollectionView DataSource
 
 extension DailyPaperView: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let headerView = collectionView.dequeueHeaderView(DailyPaperHeaderView.self, for: indexPath)
+        headerView.dateText = viewModel.date.string(with: .monthDay)
+        headerView.dayText = WeekDay(rawValue: viewModel.date.weekday)?.stringValue
+
+        return headerView
+    }
+
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return Design.numberOfSection
     }

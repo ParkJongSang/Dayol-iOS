@@ -19,13 +19,15 @@ private enum Design {
     static let dummyFont: UIFont = .appleRegular(size: 15)
 }
 
-class WeeklyCalendarView: BasePaper {
+class WeeklyCalendarView: PaperView {
     private(set) var maxHeightPerRowDict: [Int: CGFloat] = [Int: CGFloat]()
 
     let showAddSchedule = PublishSubject<Date>()
     let showSelectPaper = PublishSubject<Void>()
 
+    private let viewModel: WeeklyCalendarViewModel
     private var dayModel: [WeeklyCalendarDataModel]?
+    private var month: Month?
     var disposeBag = DisposeBag()
 
     private let dummyModel: [String] = [
@@ -34,84 +36,53 @@ class WeeklyCalendarView: BasePaper {
         "TEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTES",
         "TEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST"
     ]
-
-    private let headerView: WeeklyCalendarHeaderView = {
-        let header = WeeklyCalendarHeaderView(month: .january)
-        header.translatesAutoresizingMaskIntoConstraints = false
-        
-        return header
-    }()
-    
-    private let collectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        
-        return collectionView
-    }()
     
     override func layoutSubviews() {
         super.layoutSubviews()
         updateCollectionView()
     }
 
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        disposeBag = DisposeBag()
-    }
-    
-    override func configure(viewModel: PaperViewModel, orientation: Paper.PaperOrientation) {
-        super.configure(viewModel: viewModel, orientation: orientation)
+    init(viewModel: WeeklyCalendarViewModel, orientation: Paper.PaperOrientation) {
+        self.viewModel = viewModel
+        super.init(orientation: orientation)
+        addSubviews()
         setupCollectionView()
-        
-        contentView.addSubview(headerView)
-        contentView.addSubview(collectionView)
         setupConstraints()
-        
-        bind()
     }
 
-    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func addSubviews() {
+        addSubview(collectionView)
+    }
+
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            headerView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            headerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            headerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            
-            collectionView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+            collectionView.topAnchor.constraint(equalTo: topAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
-    
+
     private func setupCollectionView() {
-        if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-            layout.minimumLineSpacing = 0
-            layout.minimumInteritemSpacing = 0
-            collectionView.collectionViewLayout = layout
-        }
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.register(WeeklyCalendarViewCell.self, forCellWithReuseIdentifier: WeeklyCalendarViewCell.identifier)
-        collectionView.showsVerticalScrollIndicator = false
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.backgroundColor = .clear
+        collectionView.register(WeeklyCalendarViewCell.self)
+        collectionView.registerHeader(WeeklyCalendarHeaderView.self)
     }
     
     private func bind() {
-        guard let viewModel = self.viewModel as? WeeklyCalendarViewModel else { return }
-        
         viewModel.dateModel()
             .subscribe(onNext: {[weak self] models in
                 guard let month = models[safe: 1]?.month else { return }
-                self?.headerView.month = month
+                self?.month = month
                 self?.dayModel = models
                 self?.collectionView.reloadData()
             })
             .disposed(by: disposeBag)
-
-        headerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTappedHeaderView(_:))))
     }
     
     private func updateCollectionView() {
@@ -134,6 +105,13 @@ extension WeeklyCalendarView: UICollectionViewDelegate {
 // MARK: - CollectionView DataSource
 
 extension WeeklyCalendarView: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let headerView = collectionView.dequeueHeaderView(WeeklyCalendarHeaderView.self, for: indexPath)
+        headerView.month = month
+
+        return headerView
+    }
+
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return dayModel?.count ?? 0
     }

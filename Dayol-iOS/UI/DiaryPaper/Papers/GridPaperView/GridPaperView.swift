@@ -29,29 +29,41 @@ private enum Design {
     }
 }
 
-class GridPaperView: BasePaper {
-    override var identifier: String { GridPaperView.className }
-    
+final class GridPaperView: PaperView {
     private let gridImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
 
-    override func configure(viewModel: PaperViewModel, orientation: Paper.PaperOrientation) {
-        super.configure(viewModel: viewModel, orientation: orientation)
+    override init(orientation: Paper.PaperOrientation) {
+        super.init(orientation: orientation)
         gridImageView.image = getGridImage()
-        gridImageView.contentMode = .topLeft
+        addSubviews()
+        setupConstraints()
+    }
 
-        contentView.addSubViewPinEdge(gridImageView)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func addSubviews() {
+        addSubview(gridImageView)
+    }
+
+    private func setupConstraints() {
+        NSLayoutConstraint.activate([
+            gridImageView.topAnchor.constraint(equalTo: topAnchor),
+            gridImageView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            gridImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            gridImageView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
     }
 }
 
 private extension GridPaperView {
 
     func getGridImage() -> UIImage? {
-        guard let orientation = self.orientation else { return nil }
-        
         UIGraphicsBeginImageContextWithOptions(Design.gridSize(orientation: orientation), false, 0.0)
 
         guard let context = UIGraphicsGetCurrentContext() else {

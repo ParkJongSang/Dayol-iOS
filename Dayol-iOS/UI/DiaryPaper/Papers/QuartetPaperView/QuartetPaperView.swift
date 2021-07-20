@@ -18,7 +18,7 @@ private enum Design {
     static let dummyFont: UIFont = .appleRegular(size: 15)
 }
 
-final class QuartetPaperView: BasePaper {
+final class QuartetPaperView: PaperView {
     private(set) var maxHeightPerRowDict: [Int: CGFloat] = [Int: CGFloat]()
     //TODO: Delete
     private let dummyModel: [String] = [
@@ -28,33 +28,35 @@ final class QuartetPaperView: BasePaper {
         "TEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TESTTEST/TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST/TEST"
     ]
 
-    private let collectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .clear
-
-        return collectionView
-    }()
-
-    override func configure(viewModel: PaperViewModel, orientation: Paper.PaperOrientation) {
-        super.configure(viewModel: viewModel, orientation: orientation)
-        collectionView.delegate = self
-        collectionView.dataSource = self
-
-        collectionView.register(PaperTextableCell.self)
-
-        contentView.addSubview(collectionView)
+    override init(orientation: Paper.PaperOrientation) {
+        super.init(orientation: orientation)
+        addSubviews()
         setupConstraints()
+        setupCollectionView()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func addSubviews() {
+        addSubview(collectionView)
     }
 
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+            collectionView.topAnchor.constraint(equalTo: topAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+    }
+
+    private func setupCollectionView() {
+        collectionView.delegate = self
+        collectionView.dataSource = self
+
+        collectionView.register(PaperTextableCell.self)
     }
 }
 

@@ -36,7 +36,7 @@ struct WeeklyCalendarDataModel {
     }
 }
 
-class WeeklyCalendarViewModel: PaperViewModel {
+class WeeklyCalendarViewModel {
     private var numOfDaysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31]
     private var monthIndex: Int = 0
     private var year: Int = 0
@@ -46,7 +46,6 @@ class WeeklyCalendarViewModel: PaperViewModel {
 
     init(date: Date) {
         self.date = date
-        super.init(drawModel: DrawModel())
     }
     
     private func calcDate(date: Date) {

@@ -99,7 +99,7 @@ struct MonthlyCalendarDayModel {
     }
 }
 
-class MonthlyCalendarViewModel: PaperViewModel {
+class MonthlyCalendarViewModel {
     private var firstWeekDayOfMonth: WeekDay = .sunday
     private let model: MonthlyCalendarModel
     private(set) var datesOfSunday: [Date] = []
@@ -107,7 +107,6 @@ class MonthlyCalendarViewModel: PaperViewModel {
     
     init(date: Date) {
         model = MonthlyCalendarModel(date: date)
-        super.init(drawModel: DrawModel())
     }
     
     private var days: [MonthlyCalendarDayModel] {

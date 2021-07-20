@@ -18,7 +18,7 @@ private enum Design {
     }
 }
 
-final class MonthlyTrackerPaperView: BasePaper {
+final class MonthlyTrackerPaperView: PaperView {
     private let trackerImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -26,9 +26,27 @@ final class MonthlyTrackerPaperView: BasePaper {
         return imageView
     }()
 
-    override func configure(viewModel: PaperViewModel, orientation: Paper.PaperOrientation) {
-        super.configure(viewModel: viewModel, orientation: orientation)
+    override init(orientation: Paper.PaperOrientation) {
+        super.init(orientation: orientation)
         trackerImageView.image = Design.backgroundImage(orientation: orientation)
-        contentView.addSubViewPinEdge(trackerImageView)
+        addSubviews()
+        setupConstraints()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func addSubviews() {
+        addSubview(trackerImageView)
+    }
+
+    private func setupConstraints() {
+        NSLayoutConstraint.activate([
+            trackerImageView.topAnchor.constraint(equalTo: topAnchor),
+            trackerImageView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            trackerImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            trackerImageView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
     }
 }

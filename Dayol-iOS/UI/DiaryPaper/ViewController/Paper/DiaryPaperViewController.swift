@@ -37,30 +37,30 @@ class DiaryPaperViewController: DYBaseEditViewController {
         if isIPad {
             switch orientation {
             case .portrait:
-                return paperScrollView.frame.height / paperSize.height
+                return self.view.frame.height / paperSize.height
             case .landscape:
-                return paperScrollView.frame.width / paperSize.width
+                return self.view.frame.width / paperSize.width
             }
         } else {
-            return paperScrollView.frame.width / paperSize.width
+            return self.view.frame.width / paperSize.width
         }
     }
 
-    lazy var paper = PaperPresentView(paper: viewModel.paper, count: viewModel.numberOfPapers)
-    override var contentsView: DYContentsView {
-        get {
-            paper.contentsView
-        } set {
-            paper.contentsView = newValue
-        }
-    }
-    
-    private let paperScrollView: UIScrollView = {
-        let scrollView = UIScrollView()
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        
-        return scrollView
-    }()
+    private var paperView: PaperView?
+//    override var contentsView: DYContentsView {
+//        get {
+//            paper.contentsView
+//        } set {
+//            paper.contentsView = newValue
+//        }
+//    }
+//
+//    private let paperScrollView: UIScrollView = {
+//        let scrollView = UIScrollView()
+//        scrollView.translatesAutoresizingMaskIntoConstraints = false
+//
+//        return scrollView
+//    }()
 
     private let progressView: DiarySwipeAddPaperView = {
         let progressView = DiarySwipeAddPaperView()
@@ -88,36 +88,53 @@ class DiaryPaperViewController: DYBaseEditViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        scaleSubject.send(scaleVariable)
+        paperView?.transform = .init(scaleX: scaleVariable, y: scaleVariable)
     }
     
     private func initView() {
-        paper.translatesAutoresizingMaskIntoConstraints = false
+        setupPaperView()
 
-        paperScrollView.delegate = self
-        paperScrollView.minimumZoomScale = 1.0
-        paperScrollView.maximumZoomScale = 3.0
-        view.addSubViewPinEdge(paperScrollView)
-        paperScrollView.addSubViewPinEdge(paper)
-        paperScrollView.isPagingEnabled = true
+        guard let paperView = self.paperView else { return }
+        view.addSubview(paperView)
+
         view.backgroundColor = UIColor(decimalRed: 246, green: 248, blue: 250)
-
         progressView.isHidden = true
-        view.insertSubview(progressView, aboveSubview: paperScrollView)
-
-        setupConstraint()
-        combine()
         setupConstraint()
         paperActionBind()
-        viewModelBind()
+    }
+
+    private func setupPaperView() {
+        switch viewModel.paperType {
+        case .monthly:
+            let monthlyViewModel = MonthlyCalendarViewModel(date: viewModel.date)
+            paperView = MonthlyCalendarPaperView(viewModel: monthlyViewModel, orientation: viewModel.orientation)
+        case .weekly:
+            let weeklyViewModel = WeeklyCalendarViewModel(date: viewModel.date)
+            paperView = WeeklyCalendarView(viewModel: weeklyViewModel, orientation: viewModel.orientation)
+        case .daily:
+            let dailyViewModel = DailyPaperViewModel(date: viewModel.date)
+            paperView = DailyPaperView(viewModel: dailyViewModel, orientation: viewModel.orientation)
+        case .cornell:
+            paperView = CornellPaperView(orientation: viewModel.orientation)
+        case .muji:
+            paperView = MujiPaperView(orientation: viewModel.orientation)
+        case .grid:
+            paperView = GridPaperView(orientation: viewModel.orientation)
+        case .quartet:
+            paperView = QuartetPaperView(orientation: viewModel.orientation)
+        case .tracker:
+            paperView = MonthlyTrackerPaperView(orientation: viewModel.orientation)
+        }
+        paperView?.translatesAutoresizingMaskIntoConstraints = false
     }
     
     private func setupConstraint() {
+        guard let paperView = self.paperView else { return }
         NSLayoutConstraint.activate([
-            paper.widthAnchor.constraint(equalTo: paperScrollView.widthAnchor),
-
-            progressView.leadingAnchor.constraint(equalTo: view.trailingAnchor, constant: Design.Margin.contentProgressSpace),
-            progressView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            paperView.widthAnchor.constraint(equalToConstant: PaperOrientationConstant.size(orentantion: viewModel.orientation).width),
+            paperView.heightAnchor.constraint(equalToConstant: PaperOrientationConstant.size(orentantion: viewModel.orientation).height),
+            paperView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            paperView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
     }
 
@@ -127,38 +144,6 @@ class DiaryPaperViewController: DYBaseEditViewController {
 
     func setProgress(_ progress: CGFloat) {
         progressView.setProgress(progress / 116)
-    }
-    
-    private func combine() {
-        let scaleCombine = scaleSubject.sink { error in
-            // do Something
-        } receiveValue: { [weak self] value in
-            guard let self = self else { return }
-            self.paper.scaleForFit = value
-        }
-
-        cancellable.append(scaleCombine)
-    }
-
-    private func viewModelBind() {
-        viewModel.paperSubject
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] paper in
-                guard let self = self else { return }
-                self.paper.set(paper: paper)
-            })
-            .disposed(by: disposeBag)
-    }
-
-}
-
-extension DiaryPaperViewController: UIScrollViewDelegate {
-    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return paper
-    }
-    
-    func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        paperScrollView.isPagingEnabled = (scrollView.zoomScale == 1.0)
     }
 }
 
@@ -172,18 +157,18 @@ extension DiaryPaperViewController {
     }
 
     func paperActionBind() {
-        paper.showPaperSelect
-            .observe(on:MainScheduler.instance)
-            .subscribe(onNext: { [weak self] paperType in
-                self?.didReceivedEvent.onNext(.showPaperSelect(paperType: paperType))
-            })
-            .disposed(by: disposeBag)
-
-        paper.showAddSchedule
-            .observe(on:MainScheduler.instance)
-            .subscribe(onNext: { [weak self] date, scheduleType in
-                self?.didReceivedEvent.onNext(.showAddSchedule(date: date, scheduleType: scheduleType))
-            })
-            .disposed(by: disposeBag)
+//        paper.showPaperSelect
+//            .observe(on:MainScheduler.instance)
+//            .subscribe(onNext: { [weak self] paperType in
+//                self?.didReceivedEvent.onNext(.showPaperSelect(paperType: paperType))
+//            })
+//            .disposed(by: disposeBag)
+//
+//        paper.showAddSchedule
+//            .observe(on:MainScheduler.instance)
+//            .subscribe(onNext: { [weak self] date, scheduleType in
+//                self?.didReceivedEvent.onNext(.showAddSchedule(date: date, scheduleType: scheduleType))
+//            })
+//            .disposed(by: disposeBag)
     }
 }
