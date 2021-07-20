@@ -31,6 +31,15 @@ private enum Design {
 
     static let separatorLineColor: UIColor = .gray200
     static let separatorLineWidth: CGFloat = 1
+
+    static func height(orientation: Paper.PaperOrientation) -> CGFloat {
+        switch orientation {
+        case .landscape:
+            return 101
+        case .portrait:
+            return 86
+        }
+    }
 }
 
 protocol MonthlyCalendarPaperHeaderViewDelegate: AnyObject {
@@ -38,6 +47,9 @@ protocol MonthlyCalendarPaperHeaderViewDelegate: AnyObject {
 }
 
 final class MonthlyCalendarPaperHeaderView: UICollectionReusableView {
+    static func height(orientation: Paper.PaperOrientation) -> CGFloat {
+        return Design.height(orientation: orientation)
+    }
 
     weak var delegate: MonthlyCalendarPaperHeaderViewDelegate?
 
@@ -125,7 +137,6 @@ final class MonthlyCalendarPaperHeaderView: UICollectionReusableView {
         NSLayoutConstraint.activate([
             monthLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.monthLeading),
             monthLabel.topAnchor.constraint(equalTo: topAnchor, constant: Design.monthTop),
-            monthLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Design.monthBottom),
             
             arrowButton.centerYAnchor.constraint(equalTo: monthLabel.centerYAnchor),
             arrowButton.leadingAnchor.constraint(equalTo: monthLabel.trailingAnchor, constant: Design.buttonLeft),

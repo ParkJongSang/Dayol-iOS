@@ -15,15 +15,16 @@ private enum Design {
     static let mohthFontColor: UIColor = .black
     static let monthTop: CGFloat = 18
     static let monthLeading: CGFloat = 18
-    static let monthBottom: CGFloat = 37
-    static let monthHeight: CGFloat = 31
     
     static let buttonLeft: CGFloat = 8
     static let buttonSize: CGSize = CGSize(width: 8, height: 4)
     static let buttonImage = UIImage(named: "downArrow")
+    static let height: CGFloat = 86
 }
 
 class WeeklyCalendarHeaderView: UICollectionReusableView {
+    static let height: CGFloat = Design.height
+
     private let monthLabel: UILabel = {
         let label = UILabel()
         label.textColor = Design.mohthFontColor
@@ -60,8 +61,6 @@ class WeeklyCalendarHeaderView: UICollectionReusableView {
         NSLayoutConstraint.activate([
             monthLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.monthLeading),
             monthLabel.topAnchor.constraint(equalTo: topAnchor, constant: Design.monthTop),
-            monthLabel.heightAnchor.constraint(equalToConstant: Design.monthHeight),
-            monthLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Design.monthBottom),
             
             arrowButton.centerYAnchor.constraint(equalTo: monthLabel.centerYAnchor),
             arrowButton.leftAnchor.constraint(equalTo: monthLabel.rightAnchor, constant: Design.buttonLeft)

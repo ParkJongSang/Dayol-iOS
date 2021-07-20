@@ -26,9 +26,21 @@ private enum Design {
     static let dateLeftMargin: CGFloat = 18.0
     static let dayLeftMargin: CGFloat = 7.0
 
+    static func height(orientation: Paper.PaperOrientation) -> CGFloat {
+        switch orientation {
+        case .landscape:
+            return 72
+        case .portrait:
+            return 60
+        }
+    }
 }
 
 final class DailyPaperHeaderView: UICollectionReusableView {
+    static func height(orientation: Paper.PaperOrientation) -> CGFloat {
+        return Design.height(orientation: orientation)
+    }
+
     private let titleArea: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -67,10 +79,6 @@ final class DailyPaperHeaderView: UICollectionReusableView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func prepareForReuse() {
-        
-    }
-
     private func addSubviews() {
         addSubview(dateLabel)
         addSubview(dayLabel)
@@ -81,7 +89,6 @@ final class DailyPaperHeaderView: UICollectionReusableView {
         NSLayoutConstraint.activate([
             dateLabel.topAnchor.constraint(equalTo: topAnchor, constant: Design.dateTop),
             dateLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Design.dateLeading),
-            dateLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Design.dateBottom),
 
             dayLabel.bottomAnchor.constraint(equalTo: dateLabel.bottomAnchor),
             dayLabel.leadingAnchor.constraint(equalTo: dateLabel.trailingAnchor, constant: Design.dayLeftMargin),

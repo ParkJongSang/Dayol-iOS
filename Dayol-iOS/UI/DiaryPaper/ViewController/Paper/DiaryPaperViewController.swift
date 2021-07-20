@@ -96,6 +96,7 @@ class DiaryPaperViewController: DYBaseEditViewController {
 
         guard let paperView = self.paperView else { return }
         view.addSubview(paperView)
+        view.addSubview(progressView)
 
         view.backgroundColor = UIColor(decimalRed: 246, green: 248, blue: 250)
         progressView.isHidden = true
@@ -131,6 +132,9 @@ class DiaryPaperViewController: DYBaseEditViewController {
     private func setupConstraint() {
         guard let paperView = self.paperView else { return }
         NSLayoutConstraint.activate([
+            progressView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            progressView.leadingAnchor.constraint(equalTo: view.trailingAnchor, constant: Design.Margin.contentProgressSpace),
+
             paperView.widthAnchor.constraint(equalToConstant: PaperOrientationConstant.size(orentantion: viewModel.orientation).width),
             paperView.heightAnchor.constraint(equalToConstant: PaperOrientationConstant.size(orentantion: viewModel.orientation).height),
             paperView.centerYAnchor.constraint(equalTo: view.centerYAnchor),

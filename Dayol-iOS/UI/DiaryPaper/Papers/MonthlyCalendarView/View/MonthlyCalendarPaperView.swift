@@ -15,6 +15,7 @@ private enum Design {
     }
 
     static let maxScheduleCount: Int = 3
+    static let scheduleContainerTop: CGFloat = 21
 }
 
 final class MonthlyCalendarPaperView: PaperView {
@@ -34,6 +35,7 @@ final class MonthlyCalendarPaperView: PaperView {
         addSubviews()
         setupConstraints()
         setupCollectionView()
+        bind()
     }
 
     required init?(coder: NSCoder) {
@@ -52,6 +54,7 @@ final class MonthlyCalendarPaperView: PaperView {
     private func setupCollectionView() {
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.isScrollEnabled = false
         collectionView.register(MonthlyCalendarViewDayCell.self)
         collectionView.registerHeader(MonthlyCalendarPaperHeaderView.self)
     }
@@ -95,6 +98,7 @@ final class MonthlyCalendarPaperView: PaperView {
         viewModel.dateModel()
             .subscribe(onNext: { [weak self] dateModel in
                 guard let self = self else { return }
+                self.firstDatesOfSunday = self.viewModel.datesOfSunday
                 self.dateModel = dateModel
                 self.days = dateModel.days
             })
@@ -131,6 +135,10 @@ extension MonthlyCalendarPaperView {
 // MARK: - UICollectionViewDataSource
 
 extension MonthlyCalendarPaperView: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: MonthlyCalendarPaperHeaderView.height(orientation: orientation))
+    }
+
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let headerView = collectionView.dequeueHeaderView(MonthlyCalendarPaperHeaderView.self, for: indexPath)
         headerView.delegate = self
@@ -171,6 +179,14 @@ extension MonthlyCalendarPaperView: UICollectionViewDelegate {
 // MARK: - UICollectionViewDelegateFlowLayout
 
 extension MonthlyCalendarPaperView: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return .zero
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return .zero
+    }
+
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         if indexPath.item % 6 == 0 {
             for index in 0..<scheduleContainerViews.count {
@@ -178,19 +194,21 @@ extension MonthlyCalendarPaperView: UICollectionViewDelegateFlowLayout {
             }
         }
 
-        return CGSize(width: collectionView.frame.size.width / 7, height: collectionView.frame.size.height / 6)
+        let height: CGFloat = (collectionView.frame.height - MonthlyCalendarPaperHeaderView.height(orientation: orientation)) / 6
+
+        return CGSize(width: collectionView.frame.size.width / 7, height: height)
     }
 
     private func updateScheduleLineContainerConstraint(index: Int) {
-        let cellHeight: CGFloat = collectionView.frame.size.height / 6
-        let topConstant: CGFloat = 26 + (cellHeight * CGFloat(index))
+        let cellHeight: CGFloat = (collectionView.frame.height - MonthlyCalendarPaperHeaderView.height(orientation: orientation)) / 6
+        let topConstant: CGFloat = MonthlyCalendarPaperHeaderView.height(orientation: orientation) + (cellHeight * CGFloat(index)) + Design.scheduleContainerTop
         NSLayoutConstraint.activate([
             scheduleContainerViews[index].topAnchor.constraint(equalTo: topAnchor, constant: topConstant)
         ])
     }
 }
 
-// MARK: - UICollectionViewDelegateFlowLayout
+// MARK: - MonthlyCalendarPaperHeaderViewDelegate
 
 extension MonthlyCalendarPaperView: MonthlyCalendarPaperHeaderViewDelegate {
     func headerViewDidTappedLabel(_ monthlyCalendarHeaderView: MonthlyCalendarPaperHeaderView) {

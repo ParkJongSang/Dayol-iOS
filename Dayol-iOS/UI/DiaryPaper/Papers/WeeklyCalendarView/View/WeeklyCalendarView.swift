@@ -48,6 +48,7 @@ class WeeklyCalendarView: PaperView {
         addSubviews()
         setupCollectionView()
         setupConstraints()
+        bind()
     }
 
     required init?(coder: NSCoder) {
@@ -105,6 +106,10 @@ extension WeeklyCalendarView: UICollectionViewDelegate {
 // MARK: - CollectionView DataSource
 
 extension WeeklyCalendarView: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: WeeklyCalendarHeaderView.height)
+    }
+
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let headerView = collectionView.dequeueHeaderView(WeeklyCalendarHeaderView.self, for: indexPath)
         headerView.month = month
@@ -177,7 +182,7 @@ extension WeeklyCalendarView: UICollectionViewDelegateFlowLayout {
 
         let itemPerRow = Design.numberOfItemPerRow
         let width = collectionView.frame.size.width * 0.5
-        let defaultHeight = collectionView.frame.size.height * 0.25
+        let defaultHeight = (collectionView.frame.height - WeeklyCalendarHeaderView.height) * 0.25
         var estimatedHeight = defaultHeight
 
         for index in 0..<itemPerRow {

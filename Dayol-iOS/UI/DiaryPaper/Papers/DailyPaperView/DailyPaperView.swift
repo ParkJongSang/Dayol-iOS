@@ -84,6 +84,10 @@ extension DailyPaperView: UICollectionViewDelegate {
 // MARK: - CollectionView DataSource
 
 extension DailyPaperView: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: DailyPaperHeaderView.height(orientation: orientation))
+    }
+
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let headerView = collectionView.dequeueHeaderView(DailyPaperHeaderView.self, for: indexPath)
         headerView.dateText = viewModel.date.string(with: .monthDay)
